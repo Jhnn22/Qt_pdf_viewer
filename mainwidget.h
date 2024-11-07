@@ -2,6 +2,11 @@
 #define MAINWIDGET_H
 
 #include <QWidget>
+#include <QUrl>
+
+class QPdfView;
+class QPdfDocument;
+class QFileDialog;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,5 +24,15 @@ public:
 
 private:
     Ui::MainWidget *ui;
+
+    QPdfView *m_pdfView;
+    QPdfDocument *m_pdfDocument;
+    QFileDialog *m_fileDialog = nullptr;
+
+
+private:
+    void setConnects();
+    void open(const QUrl &pdfLocation);
+    void pageSelected(int page);
 };
 #endif // MAINWIDGET_H
