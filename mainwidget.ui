@@ -39,6 +39,9 @@
       </widget>
      </item>
      <item>
+      <widget class="QLineEdit" name="pageInput_lineEdit"/>
+     </item>
+     <item>
       <widget class="QPushButton" name="back_pushButton">
        <property name="text">
         <string>&lt;</string>

@@ -4,9 +4,10 @@
 #include <QWidget>
 #include <QUrl>
 
+class QFileDialog;
 class QPdfView;
 class QPdfDocument;
-class QFileDialog;
+class QPdfPageNavigator;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,10 +26,10 @@ public:
 private:
     Ui::MainWidget *ui;
 
-    QPdfView *m_pdfView;
-    QPdfDocument *m_pdfDocument;
-    QFileDialog *m_fileDialog = nullptr;
-
+    QFileDialog *m_fileDialog;              // 파일 탐색기
+    QPdfView *m_pdfView;                    // pdf를 표시
+    QPdfDocument *m_pdfDocument;            // pdf의 데이터를 제공
+    QPdfPageNavigator *m_pdfPageNavigator;  // pdf의 페이지 탐색
 
 private:
     void setConnects();
