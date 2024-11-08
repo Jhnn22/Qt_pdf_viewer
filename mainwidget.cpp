@@ -71,9 +71,9 @@ void MainWidget::setConnects(){
         }
     });
     // 전체 페이지 수 표시
-    ui->label->setText("/ ");
+    ui->totalPage_label->setText("/ ");
     connect(this, &MainWidget::updateTotalPage, this, [this](int totalPage){
-        ui->label->setText("/ " + QString::number(totalPage));
+        ui->totalPage_label->setText("/ " + QString::number(totalPage));
     });
 }
 
