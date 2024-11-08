@@ -12,17 +12,35 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets PdfWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Widgets PdfWidgets)
 
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/ui")
+
+include_directories(
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+set(PROJECT_HEADERS
+    include/mainwidget.h
+    include/pageselector.h
+    include/zoomselector.h
+)
+
 set(PROJECT_SOURCES
-        main.cpp
-        mainwidget.cpp
-        mainwidget.h
-        mainwidget.ui
+    source/mainwidget.cpp
+    source/pageselector.cpp
+    source/zoomselector.cpp
+)
+
+set(PROJECT_UI
+    ui/mainwidget.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(PdfViewer_with_Qt
         MANUAL_FINALIZATION
+        main.cpp
+        ${PROJECT_HEADERS}
         ${PROJECT_SOURCES}
+        ${PROJECT_UI}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET PdfViewer_with_Qt APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
