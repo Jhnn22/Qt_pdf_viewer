@@ -70,12 +70,18 @@ void MainWidget::setConnects(){
             ui->pageInput_lineEdit->setText(QString::number(m_pdfPageNavigator->currentPage() + 1));    // 잘못된 입력인 경우, 현재 페이지를 표시
         }
     });
+    // 전체 페이지 수 표시
+    ui->label->setText("/ ");
+    connect(this, &MainWidget::updateTotalPage, this, [this](int totalPage){
+        ui->label->setText("/ " + QString::number(totalPage));
+    });
 }
 
 void MainWidget::open(const QUrl &pdfLocation){
     if(pdfLocation.isLocalFile()){
         m_pdfDocument->load(pdfLocation.toLocalFile());
         pageSelected(0);
+        emit updateTotalPage(m_pdfDocument->pageCount());
     }
     else{
         qDebug() << "failed to open";

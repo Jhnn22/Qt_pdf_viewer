@@ -23,6 +23,9 @@ public:
     MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
 
+signals:
+    void updateTotalPage(const int totalPage);
+
 private:
     Ui::MainWidget *ui;
 
