@@ -39,53 +39,47 @@ void MainWidget::setConnects(){
     m_pdfPageNavigator = m_pdfView->pageNavigator();
     connect(ui->back_pushButton, &QPushButton::clicked, this, [this](){
         currentIndex = m_pdfPageNavigator->currentPage();
-        m_pageSelector->pageChanged_with_back_pushButton(currentIndex);
+        m_pageSelector->pageSelect_with_back_pushButton(currentIndex);
     });
     connect(ui->forward_pushButton, &QPushButton::clicked, this, [this](){
         currentIndex = m_pdfPageNavigator->currentPage();
-        m_pageSelector->pageChanged_with_forward_pushButton(currentIndex);
+        m_pageSelector->pageSelect_with_forward_pushButton(currentIndex);
     });
     connect(ui->page_lineEdit, &QLineEdit::returnPressed, this, [this](){
-        QString page_str = ui->page_lineEdit->text();
-        m_pageSelector->pageChanged(page_str);
+        QString inputText = ui->page_lineEdit->text();
+        m_pageSelector->pageSelect(inputText);
     });
-    connect(m_pageSelector, &PageSelector::currentIndexChanged, this, [this](const int changedIndex){
-        if(changedIndex < 0){
+    // 페이지 적용 및 표시
+    connect(m_pageSelector, &PageSelector::pageChanged, this, [this](const int pageIndex, const QString &text){
+        if(pageIndex < 0){
             ui->page_lineEdit->setText(QString::number(m_pdfPageNavigator->currentPage() + 1)); // 잘못된 입력인 경우, 현재 페이지를 표시
         }
-        else m_pdfPageNavigator->jump(changedIndex, {}, m_pdfPageNavigator->currentZoom());
-    });
-    // 현재 페이지 위치 표시
-    connect(m_pageSelector, &PageSelector::currentPageChanged, this, [this](const int currentPage){
-        ui->page_lineEdit->setText(QString::number(currentPage));
-    });
-    // 초기 페이지 정보 설정
-    ui->totalPage_label->setText(" / ");
-    connect(this, &MainWidget::set_PdfPageInfo, this, [this](const int begin, const int end){
-        ui->page_lineEdit->setText(QString::number(begin));
-        ui->totalPage_label->setText(" / " + QString::number(end));
+        else{
+            m_pdfPageNavigator->jump(pageIndex, {}, m_pdfPageNavigator->currentZoom());
+            ui->page_lineEdit->setText(text);
+        }
     });
 
     // 화면 비율 관리--------------------------------------------------------------
     // 화면 비율 선택
     connect(ui->zoomOut_pushButton, &QPushButton::clicked, this, [this](){
-
+        currentZoomFactor = m_pdfView->zoomFactor();
+        m_zoomSelector->zoomSelect_with_zoomOut_pushButton(currentZoomFactor);
     });
     connect(ui->zoomIn_pushButton, &QPushButton::clicked, this, [this](){
-
+        currentZoomFactor = m_pdfView->zoomFactor();
+        m_zoomSelector->zoomSelect_with_zoomIn_pushButton(currentZoomFactor);
     });
     connect(ui->zoom_lineEdit, &QLineEdit::returnPressed, this, [this](){
-        QString ratio = ui->zoom_lineEdit->text();
-        m_zoomSelector->ratioChanged(ratio);
+        QString inputText = ui->zoom_lineEdit->text();
+        m_zoomSelector->zoomSelect(inputText);
     });
-    // 화면 비율 표시
-    connect(m_zoomSelector, &ZoomSelector::zoomFactorChanged, this, [this](qreal factor){
-        m_pdfView->setZoomFactor(factor);
-        QString ratio = ui->zoom_lineEdit->text();
-        if(!ratio.contains('%')){
-            ratio.append('%');
-        }
-        ui->zoom_lineEdit->setText(ratio);
+    // 화면 비율 적용 및 표시
+    connect(m_zoomSelector, &ZoomSelector::zoomChanged, this, [this](const qreal zoomFactor, const QString &text){
+        m_pdfView->setZoomFactor(zoomFactor);
+        ui->zoom_lineEdit->setText(text);
+
+        qDebug() << m_pdfView->zoomFactor();    // 확인용 디버그 코드
     });
 }
 
@@ -93,8 +87,12 @@ void MainWidget::open(const QUrl &pdfLocation){
     if(pdfLocation.isLocalFile()){
         m_pdfDocument->load(pdfLocation.toLocalFile());
         pageSelected(0);
-        emit set_PdfPageInfo(1, m_pdfDocument->pageCount());
-        m_pageSelector->get_PdfIndexInfo(0, m_pdfDocument->pageCount() - 1);
+        m_pageSelector->getPdfIndexInfo(0, m_pdfDocument->pageCount() - 1);
+
+        // 초기 화면 설정
+        ui->page_lineEdit->setText(QString::number(m_pdfPageNavigator->currentPage() + 1));
+        ui->totalPage_label->setText(" / " + QString::number(m_pdfDocument->pageCount()));
+        ui->zoom_lineEdit->setText(QString::number(m_pdfView->zoomFactor() * 100).append('%'));
     }
     else{
         qDebug() << "failed to open";

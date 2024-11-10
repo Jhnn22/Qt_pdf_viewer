@@ -9,17 +9,16 @@ class PageSelector : public QObject
 public:
     explicit PageSelector(QObject *parent = nullptr);
 
-    void get_PdfIndexInfo(const int begin, const int end);
+    void getPdfIndexInfo(const int begin, const int end);
 
 public slots:
 
-    void pageChanged_with_back_pushButton(const int currentIndex);
-    void pageChanged_with_forward_pushButton(const int currentIndex);
-    void pageChanged(const QString &page_str);
+    void pageSelect_with_back_pushButton(const int currentPageIndex);
+    void pageSelect_with_forward_pushButton(const int currentPageIndex);
+    void pageSelect(const QString &inputText);
 
 signals:
-    void currentIndexChanged(const int changedIndex);
-    void currentPageChanged(const int changedPage);
+    void pageChanged(const int pageIndex, const QString &text);
 
 private:
     int begin, end;

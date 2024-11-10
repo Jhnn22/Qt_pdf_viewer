@@ -10,13 +10,19 @@ public:
     explicit ZoomSelector(QObject *parent = nullptr);
 
 public slots:
-    void ratioChanged_with_zoomOut_pushButton();
-    void ratioChanged_with_zoomIn_pushButton();
-    void ratioChanged(const QString &ratio);
-
+    void zoomSelect_with_zoomOut_pushButton(const qreal currentZoomFactor);
+    void zoomSelect_with_zoomIn_pushButton(const qreal currentZoomFactor);
+    void zoomSelect(const QString &inputText);
 
 signals:
-    void zoomFactorChanged(qreal zoomFactor);
+    void zoomChanged(const qreal zoomFactor, const QString &text);
+
+private:
+    int currentZoomLevelIndex;
+
+private:
+    const QVector<int> zoomLevels;
+    int findNearestZoomLevel(const qreal currentZoomFactor);
 };
 
 #endif // ZOOMSELECTOR_H

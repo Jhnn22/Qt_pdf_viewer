@@ -27,7 +27,7 @@ public:
     ~MainWidget();
 
 signals:
-    void set_PdfPageInfo(const int begin, const int end);
+    void setPdfPageInfo(const int begin, const int end);
 
 private:
     Ui::MainWidget *ui;
@@ -42,6 +42,7 @@ private:
 
 private:
     int currentIndex;
+    qreal currentZoomFactor;
 
 private:
     void setConnects();
