@@ -10,14 +10,14 @@ void PageSelector::getPdfIndexInfo(const int begin, const int end){
     this->end = end;
 }
 
-void PageSelector::pageSelect_with_back_pushButton(const int currentPageIndex){
+void PageSelector::pageSelectWithBackPushButton(const int currentPageIndex){
     if(currentPageIndex > begin){
         int prevPageIndex = currentPageIndex - 1;
         emit pageChanged(prevPageIndex, QString::number(prevPageIndex + 1));
     }
 }
 
-void PageSelector::pageSelect_with_forward_pushButton(const int currentPageIndex){
+void PageSelector::pageSelectWithForwardPushButton(const int currentPageIndex){
     if(currentPageIndex < end){
         int nextPageIndex = currentPageIndex + 1;
         emit pageChanged(nextPageIndex, QString::number(nextPageIndex + 1));

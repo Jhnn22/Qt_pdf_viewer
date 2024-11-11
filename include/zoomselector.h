@@ -10,8 +10,8 @@ public:
     explicit ZoomSelector(QObject *parent = nullptr);
 
 public slots:
-    void zoomSelect_with_zoomOut_pushButton(const qreal currentZoomFactor);
-    void zoomSelect_with_zoomIn_pushButton(const qreal currentZoomFactor);
+    void zoomSelectWithZoomOutPushButton(const qreal currentZoomFactor);
+    void zoomSelectWithZoomInPushButton(const qreal currentZoomFactor);
     void zoomSelect(const QString &inputText);
 
 signals:

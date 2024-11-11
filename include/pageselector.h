@@ -13,8 +13,8 @@ public:
 
 public slots:
 
-    void pageSelect_with_back_pushButton(const int currentPageIndex);
-    void pageSelect_with_forward_pushButton(const int currentPageIndex);
+    void pageSelectWithBackPushButton(const int currentPageIndex);
+    void pageSelectWithForwardPushButton(const int currentPageIndex);
     void pageSelect(const QString &inputText);
 
 signals:

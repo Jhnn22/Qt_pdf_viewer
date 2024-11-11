@@ -43,7 +43,7 @@
      <property name="spacing">
       <number>5</number>
      </property>
-     <item alignment="">
+     <item>
       <widget class="QWidget" name="widget" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -80,7 +80,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QPushButton" name="load_pushButton">
+         <widget class="QPushButton" name="loadPushButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -142,7 +142,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLineEdit" name="page_lineEdit">
+            <widget class="QLineEdit" name="pageLineEdit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -170,7 +170,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="totalPage_label">
+            <widget class="QLabel" name="totalPageLabel">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -235,7 +235,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QPushButton" name="zoomOut_pushButton">
+            <widget class="QPushButton" name="zoomOutPushButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -260,7 +260,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="zoom_lineEdit">
+            <widget class="QLineEdit" name="zoomLineEdit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -288,7 +288,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="zoomIn_pushButton">
+            <widget class="QPushButton" name="zoomInPushButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -353,7 +353,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QPushButton" name="back_pushButton">
+            <widget class="QPushButton" name="backPushButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -378,7 +378,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="forward_pushButton">
+            <widget class="QPushButton" name="forwardPushButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>

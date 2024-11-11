@@ -32,13 +32,13 @@ signals:
 private:
     Ui::MainWidget *ui;
 
-    PageSelector *m_pageSelector;
-    ZoomSelector *m_zoomSelector;
+    PageSelector *pageSelector;
+    ZoomSelector *zoomSelector;
 
-    QFileDialog *m_fileDialog;              // 파일 탐색기
-    QPdfView *m_pdfView;                    // pdf를 표시
-    QPdfDocument *m_pdfDocument;            // pdf의 데이터를 제공
-    QPdfPageNavigator *m_pdfPageNavigator;  // pdf의 페이지 탐색
+    QFileDialog *fileDialog;              // 파일 탐색기
+    QPdfView *pdfView;                    // pdf를 표시
+    QPdfDocument *pdfDocument;            // pdf의 데이터를 제공
+    QPdfPageNavigator *pdfPageNavigator;  // pdf의 페이지 탐색
 
 private:
     int currentIndex;
@@ -50,6 +50,6 @@ private:
     void pageSelected(int page);
 
 private slots:
-    void load_pushButton_clicked();
+    void loadPushButtonClicked();
 };
 #endif // MAINWIDGET_H
