@@ -9,6 +9,7 @@
 #include <QPdfView>
 #include <QPdfDocument>
 #include <QPdfPageNavigator>
+#include <QScrollBar>
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
@@ -57,6 +58,15 @@ void MainWidget::setConnects(){
         else{
             pdfPageNavigator->jump(pageIndex, {}, pdfPageNavigator->currentZoom());
             ui->pageLineEdit->setText(text);
+        }
+    });
+    // 스크롤 바 사용시 페이지 표시 업데이트
+    prevIndex = pdfPageNavigator->currentPage();
+    connect(pdfView->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](){
+        currentIndex = pdfPageNavigator->currentPage();
+        if(prevIndex != currentIndex){
+            prevIndex = currentIndex;
+            ui->pageLineEdit->setText(QString::number(currentIndex + 1));
         }
     });
 
