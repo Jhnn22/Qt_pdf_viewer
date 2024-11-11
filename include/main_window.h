@@ -3,10 +3,7 @@
 
 #include <QMainWindow>
 
-class Pdf_Viewer_Widget;
-
 class QFileDialog;
-class QMdiSubWindow;
 
 namespace Ui {
 class Main_Window;
@@ -22,9 +19,7 @@ public:
 
 private:
     Ui::Main_Window *ui;
-    Pdf_Viewer_Widget *pdf_viewer_widget;
     QFileDialog *file_dialog;
-    QMdiSubWindow *sub_window;
 
 private:
     void set_tool_bar();

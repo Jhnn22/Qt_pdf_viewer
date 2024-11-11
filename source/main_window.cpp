@@ -13,8 +13,10 @@ Main_Window::Main_Window(QWidget *parent)
     , file_dialog(nullptr)
 {
     ui->setupUi(this);
+    ui->mdi_area->setOption(QMdiArea::DontMaximizeSubWindowOnActivation);   // 활성화된 서브 윈도우가 다른 서브 윈도우에 영향을 주지 않음
 
     set_tool_bar();
+
 }
 
 Main_Window::~Main_Window()
@@ -42,8 +44,8 @@ void Main_Window::action_open_file_triggered(){
 
 void Main_Window::open(const QUrl file_location){
     if(file_location.isLocalFile()){
-        pdf_viewer_widget = new Pdf_Viewer_Widget(file_location, this);
-        sub_window = ui->mdi_area->addSubWindow(pdf_viewer_widget);
+        Pdf_Viewer_Widget *pdf_viewer_widget = new Pdf_Viewer_Widget(file_location, this);
+        QMdiSubWindow *sub_window = ui->mdi_area->addSubWindow(pdf_viewer_widget);
         sub_window->setAttribute(Qt::WA_DeleteOnClose);
         sub_window->show();
     }
