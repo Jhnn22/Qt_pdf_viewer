@@ -19,19 +19,22 @@ include_directories(
 )
 
 set(PROJECT_HEADERS
-    include/mainwidget.h
-    include/pageselector.h
-    include/zoomselector.h
+    include/pdf_viewer_widget.h
+    include/page_selector.h
+    include/zoom_selector.h
+    include/main_window.h
 )
 
 set(PROJECT_SOURCES
-    source/mainwidget.cpp
-    source/pageselector.cpp
-    source/zoomselector.cpp
+    source/pdf_viewer_widget.cpp
+    source/page_selector.cpp
+    source/zoom_selector.cpp
+    source/main_window.cpp
 )
 
 set(PROJECT_UI
-    ui/mainwidget.ui
+    ui/pdf_viewer_widget.ui
+    ui/main_window.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
