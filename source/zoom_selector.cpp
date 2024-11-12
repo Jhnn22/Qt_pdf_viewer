@@ -28,22 +28,22 @@ void Zoom_Selector::zoom_select_with_zoom_in_push_button(const qreal current_zoo
     emit zoom_changed(zoom_levels[current_zoom_level_index + 1] / 100.0, QString::number(zoom_levels[current_zoom_level_index + 1]).append('%'));
 }
 
-void Zoom_Selector::zoom_select(const QString &inputText){
-    qreal zoomFactor = 1.0;
+void Zoom_Selector::zoom_select_with_zoom_line_edit(const QString &input_text){
+    qreal zoom_factor = 1.0;
     QString text = "100%";
 
-    QString withoutPercent(inputText);
-    withoutPercent.remove(QLatin1Char('%'));
+    QString without_percent(input_text);
+    without_percent.remove(QLatin1Char('%'));
 
     bool ok = false;
-    const int zoomLevel = withoutPercent.toInt(&ok);
+    const int zoom_level = without_percent.toInt(&ok);
     if(ok){
-        int adjustedZoomLevel = qBound(zoom_levels.first(), zoomLevel, zoom_levels.last());
-        zoomFactor = adjustedZoomLevel / 100.0;
-        text = QString::number(adjustedZoomLevel).append('%');
+        int adjusted_zoom_level = qBound(zoom_levels.first(), zoom_level, zoom_levels.last());
+        zoom_factor = adjusted_zoom_level / 100.0;
+        text = QString::number(adjusted_zoom_level).append('%');
     }
 
-    emit zoom_changed(zoomFactor, text);
+    emit zoom_changed(zoom_factor, text);
 }
 
 int Zoom_Selector::find_nearest_zoom_level(const qreal current_zoom_factor){

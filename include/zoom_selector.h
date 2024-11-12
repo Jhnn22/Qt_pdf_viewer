@@ -12,10 +12,10 @@ public:
 public slots:
     void zoom_select_with_zoom_out_push_button(const qreal current_zoom_factor);
     void zoom_select_with_zoom_in_push_button(const qreal current_zoom_factor);
-    void zoom_select(const QString &input_text);
+    void zoom_select_with_zoom_line_edit(const QString &input_text);
 
 signals:
-    void zoom_changed(const qreal zoom_factor, const QString &text);
+    void zoom_changed(const qreal changed_zoom_factor, const QString &changed_text);
 
 private:
     int current_zoom_level_index;

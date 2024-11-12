@@ -13,12 +13,12 @@ public:
 
 public slots:
 
-    void page_select_with_back_push_button(const int current_page_index);
-    void page_select_with_forward_push_button(const int current_page_index);
-    void page_select(const QString &input_text);
+    void page_select_with_prev_push_button(const int current_page_index);
+    void page_select_with_next_push_button(const int current_page_index);
+    void page_select_with_page_line_edit(const QString &input_text);
 
 signals:
-    void page_changed(const int page_index, const QString &text);
+    void page_changed(const int changed_page_index, const QString &changed_text);
 
 private:
     int begin, end;

@@ -15,7 +15,7 @@ Main_Window::Main_Window(QWidget *parent)
     ui->setupUi(this);
     ui->mdi_area->setOption(QMdiArea::DontMaximizeSubWindowOnActivation);   // 활성화된 서브 윈도우가 다른 서브 윈도우에 영향을 주지 않음
 
-    set_tool_bar();
+    set_menu_bar();
 
 }
 
@@ -24,7 +24,7 @@ Main_Window::~Main_Window()
     delete ui;
 }
 
-void Main_Window::set_tool_bar(){
+void Main_Window::set_menu_bar(){
     connect(ui->action_open_file, &QAction::triggered, this, &Main_Window::action_open_file_triggered);
 }
 

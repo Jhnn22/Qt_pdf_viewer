@@ -36,8 +36,8 @@ private:
     QPdfPageNavigator *pdf_page_navigator;  // pdf의 페이지 탐색
 
 private:
-    const QUrl pdf_location;
-    int prev_index, current_index;
+    QUrl pdf_location;
+    int prev_page_index, current_page_index;
     qreal current_zoom_factor;
 
 private:

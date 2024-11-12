@@ -48,35 +48,35 @@ void Pdf_Viewer_Widget::set_connects(){
     // 페이지 관리--------------------------------------------------------------
     // 페이지 이동
     pdf_page_navigator = pdf_view->pageNavigator();
-    connect(ui->back_push_button, &QPushButton::clicked, this, [this](){
-        current_index = pdf_page_navigator->currentPage();
-        page_selector->page_select_with_back_push_button(current_index);
+    connect(ui->prev_push_button, &QPushButton::clicked, this, [this](){
+        current_page_index = pdf_page_navigator->currentPage();
+        page_selector->page_select_with_prev_push_button(current_page_index);
     });
-    connect(ui->forward_push_button, &QPushButton::clicked, this, [this](){
-        current_index = pdf_page_navigator->currentPage();
-        page_selector->page_select_with_forward_push_button(current_index);
+    connect(ui->next_push_button, &QPushButton::clicked, this, [this](){
+        current_page_index = pdf_page_navigator->currentPage();
+        page_selector->page_select_with_next_push_button(current_page_index);
     });
     connect(ui->page_line_edit, &QLineEdit::returnPressed, this, [this](){
-        QString inputText = ui->page_line_edit->text();
-        page_selector->page_select(inputText);
+        QString input_text = ui->page_line_edit->text();
+        page_selector->page_select_with_page_line_edit(input_text);
     });
     // 페이지 적용 및 표시
-    connect(page_selector, &Page_Selector::page_changed, this, [this](const int page_index, const QString &text){
-        if(page_index < 0){
+    connect(page_selector, &Page_Selector::page_changed, this, [this](const int changed_page_index, const QString &changed_text){
+        if(changed_page_index < 0){
             ui->page_line_edit->setText(QString::number(pdf_page_navigator->currentPage() + 1)); // 잘못된 입력인 경우, 현재 페이지를 표시
         }
         else{
-            pdf_page_navigator->jump(page_index, {}, pdf_page_navigator->currentZoom());
-            ui->page_line_edit->setText(text);
+            pdf_page_navigator->jump(changed_page_index, {}, pdf_page_navigator->currentZoom());
+            ui->page_line_edit->setText(changed_text);
         }
     });
     // 스크롤 바 사용시 페이지 표시 업데이트
-    prev_index = pdf_page_navigator->currentPage();
+    prev_page_index = pdf_page_navigator->currentPage();
     connect(pdf_view->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](){
-        current_index = pdf_page_navigator->currentPage();
-        if(prev_index != current_index){
-            prev_index = current_index;
-            ui->page_line_edit->setText(QString::number(current_index + 1));
+        current_page_index = pdf_page_navigator->currentPage();
+        if(prev_page_index != current_page_index){
+            prev_page_index = current_page_index;
+            ui->page_line_edit->setText(QString::number(current_page_index + 1));
         }
     });
 
@@ -92,14 +92,12 @@ void Pdf_Viewer_Widget::set_connects(){
     });
     connect(ui->zoom_line_edit, &QLineEdit::returnPressed, this, [this](){
         QString input_text = ui->zoom_line_edit->text();
-        zoom_selector->zoom_select(input_text);
+        zoom_selector->zoom_select_with_zoom_line_edit(input_text);
     });
     // 화면 비율 적용 및 표시
-    connect(zoom_selector, &Zoom_Selector::zoom_changed, this, [this](const qreal zoom_factor, const QString &text){
-        pdf_view->setZoomFactor(zoom_factor);
-        ui->zoom_line_edit->setText(text);
-
-        qDebug() << pdf_view->zoomFactor();    // 확인용 디버그 코드
+    connect(zoom_selector, &Zoom_Selector::zoom_changed, this, [this](const qreal changed_zoom_factor, const QString &changed_text){
+        pdf_view->setZoomFactor(changed_zoom_factor);
+        ui->zoom_line_edit->setText(changed_text);
     });
 }
 

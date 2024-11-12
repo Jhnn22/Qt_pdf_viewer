@@ -22,7 +22,7 @@ private:
     QFileDialog *file_dialog;
 
 private:
-    void set_tool_bar();
+    void set_menu_bar();
     void open(const QUrl file_location);
 
 private slots:
