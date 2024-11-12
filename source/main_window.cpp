@@ -53,3 +53,4 @@ void Main_Window::open(const QUrl file_location){
         qDebug() << "failed to open";
     }
 }
+

@@ -39,8 +39,11 @@ private:
     QUrl pdf_location;
     int prev_page_index, current_page_index;
     qreal current_zoom_factor;
+    QPoint start_mouse_position;
+    bool is_dragging;
 
 private:
     void set_connects();
+    bool eventFilter(QObject *watched, QEvent *event) override; // pdf 내 마우스 움직임 감지를 위한 이벤트 필터 재정의
 };
 #endif // PDF_VIEWER_WIDGET_H
