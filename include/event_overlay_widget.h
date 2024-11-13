@@ -4,6 +4,11 @@
 #include <QWidget>
 #include <QObject>
 
+#define POINTING 0
+#define POINTING_WIDTH 10
+#define DRAWING 1
+#define DRAWING_WIDTH 5
+
 class Event_Overlay_Widget : public QWidget
 {
     Q_OBJECT
@@ -13,12 +18,25 @@ public:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void paintEvent(QPaintEvent *event);
 
-private:
-    QPoint prev_mouse_position, current_mouse_position;
-    bool just_pressed, is_dragging;
+public slots:
+    void set_paint_mode(int mode);
+    int get_paint_mode();
 
 private:
-    void update_pointer_display(const QPoint &prev_mouse_position, const QPoint &current_mouse_position);
+    QPoint prev_mouse_position, current_mouse_position;
+    bool is_dragging;
+    int prev_paint_mode, current_paint_mode;
+
+private:
+    struct Line_Info{
+        QLine line;
+        int width;
+        Line_Info(const QLine &line, const int width){
+            this->line = line;
+            this->width = width;
+        }
+    };
+    QVector<QVector<Line_Info>> total_lines;
 };
 
 #endif // EVENT_OVERLAY_WIDGET_H

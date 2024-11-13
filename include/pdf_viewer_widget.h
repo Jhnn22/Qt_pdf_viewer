@@ -11,6 +11,7 @@ class Event_Overlay_Widget;
 class QPdfView;
 class QPdfDocument;
 class QPdfPageNavigator;
+class QStackedLayout;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -36,6 +37,7 @@ private:
     QPdfView *pdf_view;                         // pdf를 표시
     QPdfDocument *pdf_document;                 // pdf의 데이터를 제공
     QPdfPageNavigator *pdf_page_navigator;      // pdf의 페이지 탐색
+    QStackedLayout *stacked_layout;             // 위젯 겹치기를 위한 레이아웃
 
 private:
     QUrl pdf_location;
@@ -46,5 +48,6 @@ private:
     void set_connects();
     void set_pdf_viewer();
     void set_stacked_layout();
+    void toggle_event_overlay_widget(int paint_mode);
 };
 #endif // PDF_VIEWER_WIDGET_H

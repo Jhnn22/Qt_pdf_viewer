@@ -5,7 +5,7 @@ Page_Selector::Page_Selector(QObject *parent)
     : QObject{parent}
 {}
 
-void Page_Selector::get_page_index_info(const int begin, const int end){
+void Page_Selector::set_page_index_info(const int begin, const int end){
     this->begin = begin;
     this->end = end;
 }

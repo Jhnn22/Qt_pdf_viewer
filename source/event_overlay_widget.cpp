@@ -3,10 +3,12 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPen>
+#include <QPoint>
 
 Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     : QWidget{parent}
-    , just_pressed(false), is_dragging(false)
+    , is_dragging(false)
+    , prev_paint_mode(-1), current_paint_mode(-1)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents, false);  // 마우스 이벤트 받기
     setAttribute(Qt::WA_NoSystemBackground, true);          // 배경 투명화
@@ -25,52 +27,72 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
     QMouseEvent *mouse_event = static_cast<QMouseEvent*>(event);
 
     // 이벤트 처리
-    switch(event->type()){
-    case QEvent::MouseButtonPress:
-        if(mouse_event->button() == Qt::LeftButton){
-            update_pointer_display(mouse_event->pos(), mouse_event->pos());
-            just_pressed = true;
-
-        }
-        break;
-    case QEvent::MouseMove:
-        if(is_dragging){
-            update_pointer_display(current_mouse_position, mouse_event->pos());
-
-        }
-        break;
-    case QEvent::MouseButtonRelease:
-        if(is_dragging){
-            update_pointer_display(current_mouse_position, mouse_event->pos());
-            is_dragging = false;
-        }
-        break;
+    if(event->type() == QEvent::MouseButtonPress && mouse_event->button() == Qt::LeftButton){
+        prev_mouse_position = current_mouse_position = mouse_event->pos();
+        is_dragging = true;
     }
+    else if(event->type() == QEvent::MouseMove && is_dragging){
+        prev_mouse_position = current_mouse_position;
+        current_mouse_position = mouse_event->pos();
+        qDebug() << current_mouse_position;
+        if(current_paint_mode == DRAWING){
+            QVector<Line_Info> lines;
+            lines.push_back(Line_Info(QLine(prev_mouse_position, current_mouse_position), DRAWING_WIDTH));
+            total_lines.push_back(lines);
+        }
+    }
+    else if(event->type() == QEvent::MouseButtonRelease && is_dragging){
+        current_mouse_position = mouse_event->pos();
+        is_dragging = false;
+    }
+    update();   // 처리한 이벤트에 대한 화면 갱신
 
     return QWidget::eventFilter(watched, event);
 }
 
 void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
     QPainter painter(this);
-    QPen pen(Qt::red, 10, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-    painter.setPen(pen);
+    QPen pen;
+    pen.setBrush(Qt::red);
+    pen.setStyle(Qt::SolidLine);
+    pen.setCapStyle(Qt::RoundCap);
+    pen.setJoinStyle(Qt::RoundJoin);
 
-    // 시작 위치 표시
-    if(just_pressed){
-        painter.drawPoint(current_mouse_position);
-        just_pressed = false;
-        is_dragging = true;
+    if(current_paint_mode == POINTING){
+
+        if(prev_paint_mode == DRAWING){
+            for(const auto &lines : total_lines){
+                for(const auto &line_info : lines){
+                    pen.setWidth(line_info.width);
+                    painter.setPen(pen);
+                    painter.drawLine(line_info.line);
+                }
+            }
+        }
+        if(is_dragging){
+            pen.setWidth(POINTING_WIDTH);
+            painter.setPen(pen);
+            painter.drawPoint(current_mouse_position);
+        }
     }
-    // 현재 위치 표시, 자연스러운 연결을 위해 라인으로 표현
-    else if(!just_pressed && is_dragging){
-        painter.drawLine(prev_mouse_position, current_mouse_position);
+    else if(current_paint_mode == DRAWING){
+        for(const auto &lines : total_lines){
+            for(const auto &line_info : lines){
+                pen.setWidth(line_info.width);
+                painter.setPen(pen);
+                painter.drawLine(line_info.line);
+            }
+        }
     }
 
     QWidget::paintEvent(event);
 }
 
-void Event_Overlay_Widget::update_pointer_display(const QPoint &prev_mouse_position, const QPoint &current_mouse_position){
-    this->prev_mouse_position = prev_mouse_position;
-    this->current_mouse_position = current_mouse_position;
-    update();
+void Event_Overlay_Widget::set_paint_mode(int paint_mode){
+    prev_paint_mode = current_paint_mode;
+    current_paint_mode = paint_mode;
+}
+
+int Event_Overlay_Widget::get_paint_mode(){
+    return this->current_paint_mode;
 }

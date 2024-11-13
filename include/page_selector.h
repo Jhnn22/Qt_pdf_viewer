@@ -9,7 +9,7 @@ class Page_Selector : public QObject
 public:
     explicit Page_Selector(QObject *parent = nullptr);
 
-    void get_page_index_info(const int begin, const int end);
+    void set_page_index_info(const int begin, const int end);
 
 public slots:
 
