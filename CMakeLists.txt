@@ -23,6 +23,7 @@ set(PROJECT_HEADERS
     include/page_selector.h
     include/zoom_selector.h
     include/main_window.h
+    include/event_overlay_widget.h
 )
 
 set(PROJECT_SOURCES
@@ -30,6 +31,7 @@ set(PROJECT_SOURCES
     source/page_selector.cpp
     source/zoom_selector.cpp
     source/main_window.cpp
+    source/event_overlay_widget.cpp
 )
 
 set(PROJECT_UI

@@ -6,6 +6,7 @@
 
 class Page_Selector;
 class Zoom_Selector;
+class Event_Overlay_Widget;
 
 class QPdfView;
 class QPdfDocument;
@@ -30,20 +31,20 @@ private:
 
     Page_Selector *page_selector;
     Zoom_Selector *zoom_selector;
+    Event_Overlay_Widget *event_overlay_widget; // 이벤트 처리를 위한 투명한 오버레이 위젯
 
-    QPdfView *pdf_view;                     // pdf를 표시
-    QPdfDocument *pdf_document;             // pdf의 데이터를 제공
-    QPdfPageNavigator *pdf_page_navigator;  // pdf의 페이지 탐색
+    QPdfView *pdf_view;                         // pdf를 표시
+    QPdfDocument *pdf_document;                 // pdf의 데이터를 제공
+    QPdfPageNavigator *pdf_page_navigator;      // pdf의 페이지 탐색
 
 private:
     QUrl pdf_location;
     int prev_page_index, current_page_index;
     qreal current_zoom_factor;
-    QPoint start_mouse_position;
-    bool is_dragging;
 
 private:
     void set_connects();
-    bool eventFilter(QObject *watched, QEvent *event) override; // pdf 내 마우스 움직임 감지를 위한 이벤트 필터 재정의
+    void set_pdf_viewer();
+    void set_stacked_layout();
 };
 #endif // PDF_VIEWER_WIDGET_H
