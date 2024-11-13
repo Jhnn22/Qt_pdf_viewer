@@ -69,7 +69,7 @@ void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
     QWidget::paintEvent(event);
 }
 
-void Event_Overlay_Widget::update_mouse_position(const QPoint &prev_mouse_position, const QPoint &current_mouse_position){
+void Event_Overlay_Widget::update_pointer_display(const QPoint &prev_mouse_position, const QPoint &current_mouse_position){
     this->prev_mouse_position = prev_mouse_position;
     this->current_mouse_position = current_mouse_position;
     update();
