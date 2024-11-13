@@ -13,6 +13,7 @@ Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     setAttribute(Qt::WA_TransparentForMouseEvents, false);  // 마우스 이벤트 받기
     setAttribute(Qt::WA_NoSystemBackground, true);          // 배경 투명화
     setWindowFlags(Qt::FramelessWindowHint);                // 프레임 없는 창
+    setFocusPolicy(Qt::StrongFocus);
 
     installEventFilter(this);
 }
@@ -95,4 +96,15 @@ void Event_Overlay_Widget::set_paint_mode(int paint_mode){
 
 int Event_Overlay_Widget::get_paint_mode(){
     return this->current_paint_mode;
+}
+
+void Event_Overlay_Widget::keyPressEvent(QKeyEvent *event){
+    if(event->key() == Qt::Key_Backspace){
+        if(!total_lines.isEmpty()){
+            total_lines.pop_back();
+            update();
+        }
+    }
+
+    QWidget::keyPressEvent(event);
 }
