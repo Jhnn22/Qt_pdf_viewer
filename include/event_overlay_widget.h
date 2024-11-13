@@ -29,6 +29,10 @@ private:
     int prev_paint_mode, current_paint_mode;
 
 private:
+    void draw_prev_lines(QPainter &painter, QPen &pen);
+    void draw_current_lines(QPainter &painter, QPen &pen);
+
+private:
     struct Line_Info{
         QLine line;
         int width;
@@ -38,6 +42,7 @@ private:
         }
     };
     QVector<QVector<Line_Info>> total_lines;
+    QVector<Line_Info> lines;
 };
 
 #endif // EVENT_OVERLAY_WIDGET_H

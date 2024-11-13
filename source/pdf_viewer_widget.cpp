@@ -133,7 +133,7 @@ void Pdf_Viewer_Widget::toggle_event_overlay_widget(int paint_mode){
         event_overlay_widget->set_paint_mode(paint_mode);
     }
     else if(stacked_layout->indexOf(event_overlay_widget) != -1 && event_overlay_widget->get_paint_mode() == paint_mode){
-        // 레이아웃으로부터 해제
+        // 레이아웃으로부터 제거
         stacked_layout->removeWidget(event_overlay_widget);
         event_overlay_widget->setParent(nullptr);
         event_overlay_widget->hide();
