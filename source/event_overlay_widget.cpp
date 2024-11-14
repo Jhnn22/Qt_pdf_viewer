@@ -107,7 +107,7 @@ void Event_Overlay_Widget::draw_current_lines(QPainter &painter, QPen &pen){
     }
 }
 
-void Event_Overlay_Widget::remove_total_lines(){
+void Event_Overlay_Widget::clear_total_lines(){
     total_lines.clear();
 }
 
