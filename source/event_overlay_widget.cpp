@@ -35,7 +35,7 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
     else if(event->type() == QEvent::MouseMove && is_dragging){
         prev_mouse_position = current_mouse_position;
         current_mouse_position = mouse_event->pos();
-        qDebug() << current_mouse_position;
+        qDebug() << current_mouse_position; // 위치 확인을 위한 디버그 코드
         if(current_paint_mode == DRAWING){
             lines.push_back(Line_Info(QLine(prev_mouse_position, current_mouse_position), DRAWING_WIDTH));
         }
@@ -105,6 +105,10 @@ void Event_Overlay_Widget::draw_current_lines(QPainter &painter, QPen &pen){
             painter.drawLine(line_info.line);
         }
     }
+}
+
+void Event_Overlay_Widget::remove_total_lines(){
+    total_lines.clear();
 }
 
 void Event_Overlay_Widget::keyPressEvent(QKeyEvent *event){

@@ -18,6 +18,7 @@ public:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void remove_total_lines();
 
 public slots:
     void set_paint_mode(int mode);
