@@ -128,15 +128,14 @@ void Pdf_Viewer_Widget::toggle_event_overlay_widget(int paint_mode){
     if(stacked_layout->indexOf(event_overlay_widget) == -1 && event_overlay_widget->parent() == nullptr){
         // 위젯 추가 및 기능 설정
         stacked_layout->addWidget(event_overlay_widget);
+        event_overlay_widget->f();
         event_overlay_widget->show();
         event_overlay_widget->raise();  // 위젯 위치를 최상위로 설정
         event_overlay_widget->set_paint_mode(paint_mode);
     }
     else if(stacked_layout->indexOf(event_overlay_widget) != -1 && event_overlay_widget->get_paint_mode() == paint_mode){
-        // 드로잉 모드의 경우 저장된 라인 초기화
-        if(paint_mode == DRAWING){
-            event_overlay_widget->clear_total_lines();
-        }
+        // 저장된 라인 초기화
+        event_overlay_widget->clear_total_lines();
         // 레이아웃으로부터 제거
         stacked_layout->removeWidget(event_overlay_widget);
         event_overlay_widget->setParent(nullptr);

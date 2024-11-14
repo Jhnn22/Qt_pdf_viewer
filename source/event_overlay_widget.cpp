@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QPoint>
+#include <QScrollBar>
 
 Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     : QWidget{parent}
@@ -16,6 +17,7 @@ Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
 
     installEventFilter(this);
+
 }
 
 bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
@@ -35,7 +37,7 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
     else if(event->type() == QEvent::MouseMove && is_dragging){
         prev_mouse_position = current_mouse_position;
         current_mouse_position = mouse_event->pos();
-        qDebug() << current_mouse_position; // 위치 확인을 위한 디버그 코드
+        // qDebug() << current_mouse_position; // 위치 확인을 위한 디버그 코드
         if(current_paint_mode == DRAWING){
             lines.push_back(Line_Info(QLine(prev_mouse_position, current_mouse_position), DRAWING_WIDTH));
         }
@@ -82,6 +84,10 @@ int Event_Overlay_Widget::get_paint_mode(){
     return this->current_paint_mode;
 }
 
+void Event_Overlay_Widget::clear_total_lines(){
+    total_lines.clear();
+}
+
 void Event_Overlay_Widget::draw_prev_lines(QPainter &painter, QPen &pen){
     for(const auto &lines : total_lines){
         for(const auto &line_info : lines){
@@ -107,9 +113,6 @@ void Event_Overlay_Widget::draw_current_lines(QPainter &painter, QPen &pen){
     }
 }
 
-void Event_Overlay_Widget::clear_total_lines(){
-    total_lines.clear();
-}
 
 void Event_Overlay_Widget::keyPressEvent(QKeyEvent *event){
     // 백 스페이스 클릭 시 가장 최근 라인 삭제
