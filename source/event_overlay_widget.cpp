@@ -4,7 +4,6 @@
 #include <QPainter>
 #include <QPen>
 #include <QPoint>
-#include <QScrollBar>
 
 Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     : QWidget{parent}
@@ -17,7 +16,6 @@ Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
 
     installEventFilter(this);
-
 }
 
 bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){

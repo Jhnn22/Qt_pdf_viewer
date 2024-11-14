@@ -10,14 +10,14 @@ void Page_Selector::set_page_index_info(const int begin, const int end){
     this->end = end;
 }
 
-void Page_Selector::page_select_with_prev_push_button(const int current_page_index){
+void Page_Selector::page_select_with_prev_page_push_button(const int current_page_index){
     if(current_page_index > begin){
         int prev_page_index = current_page_index - 1;
         emit page_changed(prev_page_index, QString::number(prev_page_index + 1));
     }
 }
 
-void Page_Selector::page_select_with_next_push_button(const int current_page_index){
+void Page_Selector::page_select_with_next_page_push_button(const int current_page_index){
     if(current_page_index < end){
         int next_page_index = current_page_index + 1;
         emit page_changed(next_page_index, QString::number(next_page_index + 1));

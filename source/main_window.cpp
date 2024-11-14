@@ -17,6 +17,7 @@ Main_Window::Main_Window(QWidget *parent)
 
     set_menu_bar();
 
+    this->showMaximized();
 }
 
 Main_Window::~Main_Window()
@@ -48,9 +49,21 @@ void Main_Window::open(const QUrl file_location){
         QMdiSubWindow *sub_window = ui->mdi_area->addSubWindow(pdf_viewer_widget);
         sub_window->setAttribute(Qt::WA_DeleteOnClose);
         sub_window->show();
+
+        QWidget *widget = sub_window->widget();
+
+        // 화면 모드 변경
+        connect(pdf_viewer_widget, &Pdf_Viewer_Widget::toggle_push_button_clicked, sub_window, [this, sub_window, widget](const int changed_page_mode){
+            if(changed_page_mode == SINGLE_PAGE){
+                widget->setParent(nullptr);
+                widget->showFullScreen();
+            }
+            else{
+                sub_window->layout()->addWidget(widget);
+            }
+        });
     }
     else{
         qDebug() << "failed to open";
     }
 }
-

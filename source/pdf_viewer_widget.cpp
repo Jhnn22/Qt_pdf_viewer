@@ -7,11 +7,11 @@
 
 #include <QFileDialog>
 #include <QStandardPaths>
-#include <QPdfView>
 #include <QPdfDocument>
 #include <QPdfPageNavigator>
 #include <QScrollBar>
 #include <QStackedLayout>
+#include <QTimer>
 
 Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &pdf_location, QWidget *parent)
     : pdf_location(pdf_location), QWidget(parent)
@@ -36,13 +36,13 @@ void Pdf_Viewer_Widget::set_connects(){
     // 페이지 관리--------------------------------------------------------------
     // 페이지 이동
     pdf_page_navigator = pdf_view->pageNavigator();
-    connect(ui->prev_push_button, &QPushButton::clicked, this, [this](){
+    connect(ui->prev_page_push_button, &QPushButton::clicked, this, [this](){
         current_page_index = pdf_page_navigator->currentPage();
-        page_selector->page_select_with_prev_push_button(current_page_index);
+        page_selector->page_select_with_prev_page_push_button(current_page_index);
     });
-    connect(ui->next_push_button, &QPushButton::clicked, this, [this](){
+    connect(ui->next_page_push_button, &QPushButton::clicked, this, [this](){
         current_page_index = pdf_page_navigator->currentPage();
-        page_selector->page_select_with_next_push_button(current_page_index);
+        page_selector->page_select_with_next_page_push_button(current_page_index);
     });
     connect(ui->page_line_edit, &QLineEdit::returnPressed, this, [this](){
         QString input_text = ui->page_line_edit->text();
@@ -90,10 +90,22 @@ void Pdf_Viewer_Widget::set_connects(){
 
     // 이벤트 처리 위젯 관리--------------------------------------------------------------
     connect(ui->pointing_push_button, &QPushButton::clicked, this, [this](){
-        toggle_event_overlay_widget(POINTING);
+        event_overlay_widget->set_paint_mode(POINTING);
     });
     connect(ui->drawing_push_button, &QPushButton::clicked, this, [this](){
-        toggle_event_overlay_widget(DRAWING);
+        event_overlay_widget->set_paint_mode(DRAWING);
+    });
+    connect(ui->toggle_push_button, &QPushButton::clicked, this, [this](){
+        if(pdf_view->pageMode() == QPdfView::PageMode::SinglePage){
+            set_page_mode(QPdfView::PageMode::MultiPage, false);
+            emit toggle_push_button_clicked(MULTI_PAGE);
+
+        }
+        else{
+            set_page_mode(QPdfView::PageMode::SinglePage, true);
+            emit toggle_push_button_clicked(SINGLE_PAGE);
+        }
+        toggle_event_overlay_widget();
     });
 }
 
@@ -124,24 +136,32 @@ void Pdf_Viewer_Widget::set_stacked_layout(){
     ui->v_layout->addLayout(stacked_layout);
 }
 
-void Pdf_Viewer_Widget::toggle_event_overlay_widget(int paint_mode){
-    if(stacked_layout->indexOf(event_overlay_widget) == -1 && event_overlay_widget->parent() == nullptr){
-        // 위젯 추가 및 기능 설정
+void Pdf_Viewer_Widget::set_page_mode(QPdfView::PageMode current_page_mode, bool enabled){
+    current_page_index = pdf_page_navigator->currentPage(); // 현재 페이지의 인덱스 저장
+    pdf_view->setPageMode(current_page_mode);
+
+    // QTimer를 사용하여 약간의 지연 후 기존 페이지로 복원
+    QTimer::singleShot(1, this, [this](){
+        pdf_page_navigator->jump(current_page_index, {}, pdf_page_navigator->currentZoom());
+    });
+
+    ui->pointing_push_button->setEnabled(enabled);
+    ui->drawing_push_button->setEnabled(enabled);
+}
+
+void Pdf_Viewer_Widget::toggle_event_overlay_widget(){
+    if(stacked_layout->indexOf(event_overlay_widget) == -1){
+        // 위젯 추가
         stacked_layout->addWidget(event_overlay_widget);
         event_overlay_widget->show();
         event_overlay_widget->raise();  // 위젯 위치를 최상위로 설정
-        event_overlay_widget->set_paint_mode(paint_mode);
     }
-    else if(stacked_layout->indexOf(event_overlay_widget) != -1 && event_overlay_widget->get_paint_mode() == paint_mode){
+    else if(stacked_layout->indexOf(event_overlay_widget) != -1){
         // 저장된 라인 초기화
         event_overlay_widget->clear_total_lines();
         // 레이아웃으로부터 제거
         stacked_layout->removeWidget(event_overlay_widget);
         event_overlay_widget->setParent(nullptr);
         event_overlay_widget->hide();
-    }
-    else if(stacked_layout->indexOf(event_overlay_widget) != -1 && event_overlay_widget->get_paint_mode() != paint_mode){
-        // 기능만 변경
-        event_overlay_widget->set_paint_mode(paint_mode);
     }
 }

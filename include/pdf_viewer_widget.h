@@ -2,13 +2,16 @@
 #define PDF_VIEWER_WIDGET_H
 
 #include <QWidget>
+#include <QPdfView>
 #include <QUrl>
+
+#define SINGLE_PAGE 0
+#define MULTI_PAGE  1
 
 class Page_Selector;
 class Zoom_Selector;
 class Event_Overlay_Widget;
 
-class QPdfView;
 class QPdfDocument;
 class QPdfPageNavigator;
 class QStackedLayout;
@@ -26,6 +29,9 @@ class Pdf_Viewer_Widget : public QWidget
 public:
     Pdf_Viewer_Widget(const QUrl &pdf_location, QWidget *parent = nullptr);
     ~Pdf_Viewer_Widget();
+
+signals:
+    void toggle_push_button_clicked(const int changed_page_mode);
 
 private:
     Ui::Pdf_Viewer_Widget *ui;
@@ -48,6 +54,7 @@ private:
     void set_connects();
     void set_pdf_viewer();
     void set_stacked_layout();
-    void toggle_event_overlay_widget(int paint_mode);
+    void set_page_mode(QPdfView::PageMode current_page_mode, bool enabled);
+    void toggle_event_overlay_widget();
 };
 #endif // PDF_VIEWER_WIDGET_H
