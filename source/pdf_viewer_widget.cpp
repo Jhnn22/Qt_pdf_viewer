@@ -128,7 +128,6 @@ void Pdf_Viewer_Widget::toggle_event_overlay_widget(int paint_mode){
     if(stacked_layout->indexOf(event_overlay_widget) == -1 && event_overlay_widget->parent() == nullptr){
         // 위젯 추가 및 기능 설정
         stacked_layout->addWidget(event_overlay_widget);
-        event_overlay_widget->f();
         event_overlay_widget->show();
         event_overlay_widget->raise();  // 위젯 위치를 최상위로 설정
         event_overlay_widget->set_paint_mode(paint_mode);

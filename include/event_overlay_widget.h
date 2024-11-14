@@ -19,12 +19,10 @@ public:
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
 
-
 public slots:
     void set_paint_mode(int mode);
     int get_paint_mode();
     void clear_total_lines();
-    void f();
 
 private:
     QPoint prev_mouse_position, current_mouse_position;
