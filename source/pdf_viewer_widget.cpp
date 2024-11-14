@@ -57,6 +57,11 @@ void Pdf_Viewer_Widget::set_connects(){
             pdf_page_navigator->jump(changed_page_index, {}, pdf_page_navigator->currentZoom());
             ui->page_line_edit->setText(changed_text);
         }
+        // event_overlay_widget이 겹쳐진 상태에서의 포커스 설정
+        if(event_overlay_widget->parent() == this){
+            event_overlay_widget->setFocus();
+        }
+
     });
     // 스크롤 바 사용시 페이지 표시 업데이트
     prev_page_index = pdf_page_navigator->currentPage();
@@ -86,6 +91,10 @@ void Pdf_Viewer_Widget::set_connects(){
     connect(zoom_selector, &Zoom_Selector::zoom_changed, this, [this](const qreal changed_zoom_factor, const QString &changed_text){
         pdf_view->setZoomFactor(changed_zoom_factor);
         ui->zoom_line_edit->setText(changed_text);
+        // event_overlay_widget이 겹쳐진 상태에서의 포커스 설정
+        if(event_overlay_widget->parent() == this){
+            event_overlay_widget->setFocus();
+        }
     });
 
     // 이벤트 처리 위젯 관리--------------------------------------------------------------
@@ -140,7 +149,7 @@ void Pdf_Viewer_Widget::set_page_mode(QPdfView::PageMode current_page_mode, bool
     current_page_index = pdf_page_navigator->currentPage(); // 현재 페이지의 인덱스 저장
     pdf_view->setPageMode(current_page_mode);
 
-    // QTimer를 사용하여 약간의 지연 후 기존 페이지로 복원
+    // QTimer를 사용하여 약간의 지연 후 기존 페이지 위치로 이동
     QTimer::singleShot(1, this, [this](){
         pdf_page_navigator->jump(current_page_index, {}, pdf_page_navigator->currentZoom());
     });
