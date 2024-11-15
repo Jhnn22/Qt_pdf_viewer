@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QObject>
-#include <QQueue>
 
 #define POINTING 0
 #define POINTING_WIDTH 10
@@ -32,8 +31,9 @@ private:
     QPoint prev_mouse_position, current_mouse_position;
     bool is_dragging;
     int prev_paint_mode, current_paint_mode;
-    QQueue<QLine> lines;
+    QVector<QVector<QLine>> paths;
     QTimer *timer;
+    qreal color_opacity = 1.0;
 
     void set_connects();
 

@@ -1,10 +1,12 @@
 #include "event_overlay_widget.h"
 
 #include <QMouseEvent>
-#include <QPainter>
-#include <QPen>
 #include <QPoint>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPen>
 #include <QTimer>
+
 
 Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     : QWidget{parent}
@@ -32,18 +34,33 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
 
     // 이벤트 처리
     if(event->type() == QEvent::MouseButtonPress && mouse_event->button() == Qt::LeftButton){
-        prev_mouse_position = current_mouse_position = mouse_event->pos();
         is_dragging = true;
+        prev_mouse_position = current_mouse_position = mouse_event->pos();
+
+        if(current_paint_mode == DRAWING){
+            paths.push_back(QVector<QLine>());  // 새로운 벡터 추가
+
+            // 투명도 초기화 및 타이머 일시 정지
+            if(timer->isActive()){
+                color_opacity = 1.0;
+                update();
+                timer->stop();
+            }
+        }
+
     }
     else if(event->type() == QEvent::MouseMove && is_dragging){
         prev_mouse_position = current_mouse_position;
         current_mouse_position = mouse_event->pos();
+
         if(current_paint_mode == DRAWING){
-            lines.enqueue(QLine(prev_mouse_position, current_mouse_position));
-        } 
+
+            paths.last().push_back(QLine(prev_mouse_position, current_mouse_position));
+        }
     }
     else if(event->type() == QEvent::MouseButtonRelease && is_dragging){
         is_dragging = false;
+
         if(current_paint_mode == DRAWING){
             emit drawing_finished();
         }
@@ -55,21 +72,34 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
 
 void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
     QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);  // 안티앨리어싱 활성화
     QPen pen;
-    pen.setBrush(Qt::red);
-    pen.setWidth(current_paint_mode == POINTING ? POINTING_WIDTH : DRAWING_WIDTH);
+    QColor pen_color = Qt::red;
+    pen_color.setAlphaF(color_opacity);
+    pen.setBrush(pen_color);
     pen.setStyle(Qt::SolidLine);
     pen.setCapStyle(Qt::RoundCap);
-    pen.setJoinStyle(Qt::RoundJoin);
+    pen.setJoinStyle(Qt::BevelJoin);
 
     if(current_paint_mode == POINTING && is_dragging){
+        pen.setWidth(POINTING_WIDTH);
         painter.setPen(pen);
         painter.drawPoint(current_mouse_position);
     }
     else if(current_paint_mode == DRAWING){
+        pen.setWidth(DRAWING_WIDTH);
+        pen_color.setAlphaF(color_opacity);
         painter.setPen(pen);
-        for(const auto &line : lines){
-            painter.drawLine(line);
+
+        for(const auto &path : paths){
+            if(!path.empty()){
+                QPainterPath painter_path;
+                painter_path.moveTo(path.first().p1());
+                for(const auto &line : path){
+                    painter_path.lineTo(line.p2());
+                }
+                painter.drawPath(painter_path);
+            }
         }
     }
 
@@ -88,20 +118,23 @@ int Event_Overlay_Widget::get_paint_mode(){
 void Event_Overlay_Widget::set_connects(){
     // 라인 지우개 설정--------------------------------------------------------------
     timer = new QTimer(this);
-    timer->setInterval(16);  // 약 60fps
     connect(timer, &QTimer::timeout, this, [this](){
-        if(!lines.empty()){
-            lines.pop_front();
-            update();
+        if(color_opacity > 0.01){
+            qDebug() << color_opacity;
+            color_opacity -= 0.01;
         }
         else{
             timer->stop();
+            paths.clear();
+            color_opacity = 1.0;
+            qDebug() << "clear";
         }
+        update();
     });
     connect(this, &Event_Overlay_Widget::drawing_finished, this, [this]{
-        // 버튼 릴리즈 이벤트 이후 타이머 시작
-        if(!is_dragging && !lines.empty()){
-            timer->start();
+        if(!is_dragging && !paths.empty()){
+            timer->start(10);
         }
     });
+
 }
