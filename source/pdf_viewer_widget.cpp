@@ -166,8 +166,6 @@ void Pdf_Viewer_Widget::toggle_event_overlay_widget(){
         event_overlay_widget->raise();  // 위젯 위치를 최상위로 설정
     }
     else if(stacked_layout->indexOf(event_overlay_widget) != -1){
-        // 저장된 라인 초기화
-        event_overlay_widget->clear_total_lines();
         // 레이아웃으로부터 제거
         stacked_layout->removeWidget(event_overlay_widget);
         event_overlay_widget->setParent(nullptr);

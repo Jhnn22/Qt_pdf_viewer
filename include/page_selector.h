@@ -12,7 +12,6 @@ public:
     void set_page_index_info(const int begin, const int end);
 
 public slots:
-
     void page_select_with_prev_page_push_button(const int current_page_index);
     void page_select_with_next_page_push_button(const int current_page_index);
     void page_select_with_page_line_edit(const QString &input_text);

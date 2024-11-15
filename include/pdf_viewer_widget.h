@@ -39,18 +39,15 @@ private:
     Page_Selector *page_selector;
     Zoom_Selector *zoom_selector;
     Event_Overlay_Widget *event_overlay_widget; // 이벤트 처리를 위한 투명한 오버레이 위젯
-
     QPdfView *pdf_view;                         // pdf를 표시
     QPdfDocument *pdf_document;                 // pdf의 데이터를 제공
     QPdfPageNavigator *pdf_page_navigator;      // pdf의 페이지 탐색
     QStackedLayout *stacked_layout;             // 위젯 겹치기를 위한 레이아웃
 
-private:
     QUrl pdf_location;
     int prev_page_index, current_page_index;
     qreal current_zoom_factor;
 
-private:
     void set_connects();
     void set_pdf_viewer();
     void set_stacked_layout();

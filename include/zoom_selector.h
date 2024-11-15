@@ -19,8 +19,6 @@ signals:
 
 private:
     int current_zoom_level_index;
-
-private:
     const QVector<int> zoom_levels;
     int find_nearest_zoom_level(const qreal current_zoom_factor);
 };

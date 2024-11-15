@@ -21,7 +21,6 @@ private:
     Ui::Main_Window *ui;
     QFileDialog *file_dialog;
 
-private:
     void set_menu_bar();
     void open(const QUrl file_location);
 
