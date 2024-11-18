@@ -21,6 +21,8 @@ Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &pdf_location, QWidget *parent)
     , pdf_view(new QPdfView(this)), pdf_document(new QPdfDocument(this))
 {
     ui->setupUi(this);
+    ui->pointing_push_button->setEnabled(false);
+    ui->drawing_push_button->setEnabled(false);
 
     set_connects();
     set_pdf_viewer();
