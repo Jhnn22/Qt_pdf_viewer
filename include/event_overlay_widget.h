@@ -22,7 +22,6 @@ public:
 
 public slots:
     void set_paint_mode(int mode);
-    int get_paint_mode();
 
 signals:
     void drawing_finished();
@@ -33,11 +32,9 @@ private:
     int prev_paint_mode, current_paint_mode;
     QVector<QVector<QLine>> paths;
     QTimer *timer;
-    qreal color_opacity = 1.0;
+    qreal color_opacity;
 
     void set_connects();
-
-
 };
 
 #endif // EVENT_OVERLAY_WIDGET_H

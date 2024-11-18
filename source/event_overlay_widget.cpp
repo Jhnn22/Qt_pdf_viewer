@@ -12,6 +12,7 @@ Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     : QWidget{parent}
     , is_dragging(false)
     , prev_paint_mode(-1), current_paint_mode(-1)
+    , color_opacity(1.0)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents, false);  // 마우스 이벤트 받기
     setAttribute(Qt::WA_NoSystemBackground, true);          // 배경 투명화
@@ -47,14 +48,12 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
                 timer->stop();
             }
         }
-
     }
     else if(event->type() == QEvent::MouseMove && is_dragging){
         prev_mouse_position = current_mouse_position;
         current_mouse_position = mouse_event->pos();
 
         if(current_paint_mode == DRAWING){
-
             paths.last().push_back(QLine(prev_mouse_position, current_mouse_position));
         }
     }
@@ -71,24 +70,26 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
 }
 
 void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
+    // painter 설정
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);  // 안티앨리어싱 활성화
+    // pen 설정
     QPen pen;
-    QColor pen_color = Qt::red;
-    pen_color.setAlphaF(color_opacity);
-    pen.setBrush(pen_color);
+    pen.setBrush(Qt::red);
+    pen.setWidth(current_paint_mode == POINTING ? POINTING_WIDTH : DRAWING_WIDTH);
     pen.setStyle(Qt::SolidLine);
     pen.setCapStyle(Qt::RoundCap);
     pen.setJoinStyle(Qt::BevelJoin);
 
     if(current_paint_mode == POINTING && is_dragging){
-        pen.setWidth(POINTING_WIDTH);
         painter.setPen(pen);
         painter.drawPoint(current_mouse_position);
     }
     else if(current_paint_mode == DRAWING){
-        pen.setWidth(DRAWING_WIDTH);
-        pen_color.setAlphaF(color_opacity);
+        // 투명도 설정
+        QColor color = Qt::red;
+        color.setAlphaF(color_opacity);
+        pen.setBrush(color);
         painter.setPen(pen);
 
         for(const auto &path : paths){
@@ -111,23 +112,17 @@ void Event_Overlay_Widget::set_paint_mode(int paint_mode){
     current_paint_mode = paint_mode;
 }
 
-int Event_Overlay_Widget::get_paint_mode(){
-    return this->current_paint_mode;
-}
-
 void Event_Overlay_Widget::set_connects(){
-    // 라인 지우개 설정--------------------------------------------------------------
+    // 라인 삭제 설정--------------------------------------------------------------
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this](){
         if(color_opacity > 0.01){
-            qDebug() << color_opacity;
             color_opacity -= 0.01;
         }
         else{
             timer->stop();
             paths.clear();
             color_opacity = 1.0;
-            qDebug() << "clear";
         }
         update();
     });
@@ -136,5 +131,4 @@ void Event_Overlay_Widget::set_connects(){
             timer->start(10);
         }
     });
-
 }
