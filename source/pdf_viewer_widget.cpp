@@ -31,6 +31,11 @@ Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &pdf_location, QWidget *parent)
 
 Pdf_Viewer_Widget::~Pdf_Viewer_Widget()
 {
+    delete page_selector;
+    delete zoom_selector;
+    delete event_overlay_widget;
+    delete pdf_view;
+    delete pdf_document;
     delete ui;
 }
 
@@ -152,7 +157,7 @@ void Pdf_Viewer_Widget::set_page_mode(QPdfView::PageMode current_page_mode, bool
     pdf_view->setPageMode(current_page_mode);
 
     // QTimer를 사용하여 약간의 지연 후 기존 페이지 위치로 이동
-    QTimer::singleShot(1, this, [this](){
+    QTimer::singleShot(30, this, [this](){
         pdf_page_navigator->jump(current_page_index, {}, pdf_page_navigator->currentZoom());
     });
 
