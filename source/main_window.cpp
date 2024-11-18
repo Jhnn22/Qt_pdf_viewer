@@ -48,6 +48,7 @@ void Main_Window::open(const QUrl file_location){
         Pdf_Viewer_Widget *pdf_viewer_widget = new Pdf_Viewer_Widget(file_location, this);
         QMdiSubWindow *sub_window = ui->mdi_area->addSubWindow(pdf_viewer_widget);
         sub_window->setAttribute(Qt::WA_DeleteOnClose);
+        sub_window->setWindowTitle(file_location.fileName());
         sub_window->show();
 
         QWidget *widget = sub_window->widget();
@@ -57,8 +58,10 @@ void Main_Window::open(const QUrl file_location){
             if(changed_page_mode == SINGLE_PAGE){
                 widget->setParent(nullptr);
                 widget->showFullScreen();
+                this->hide();
             }
             else{
+                this->show();
                 sub_window->layout()->addWidget(widget);
             }
         });
