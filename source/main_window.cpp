@@ -16,8 +16,6 @@ Main_Window::Main_Window(QWidget *parent)
     ui->mdi_area->setOption(QMdiArea::DontMaximizeSubWindowOnActivation);   // 활성화된 서브 윈도우가 다른 서브 윈도우에 영향을 주지 않음
 
     set_menu_bar();
-
-    this->showMaximized();
 }
 
 Main_Window::~Main_Window()
@@ -51,11 +49,10 @@ void Main_Window::open(const QUrl file_location){
         sub_window->setWindowTitle(file_location.fileName());
         sub_window->show();
 
+        // 페이지 모드 변경 시, 메인&서브 윈도우 화면 설정
         QWidget *widget = sub_window->widget();
-
-        // 화면 모드 변경
-        connect(pdf_viewer_widget, &Pdf_Viewer_Widget::toggle_push_button_clicked, sub_window, [this, sub_window, widget](const int changed_page_mode){
-            if(changed_page_mode == SINGLE_PAGE){
+        connect(widget->findChild<QPdfView*>(), &QPdfView::pageModeChanged, sub_window, [this, sub_window, widget](QPdfView::PageMode changed_page_mode){
+            if(changed_page_mode == QPdfView::PageMode::SinglePage){
                 widget->setParent(nullptr);
                 widget->showFullScreen();
                 this->hide();

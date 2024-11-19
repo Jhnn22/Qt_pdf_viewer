@@ -114,12 +114,9 @@ void Pdf_Viewer_Widget::set_connects(){
     connect(ui->toggle_push_button, &QPushButton::clicked, this, [this](){
         if(pdf_view->pageMode() == QPdfView::PageMode::SinglePage){
             set_page_mode(QPdfView::PageMode::MultiPage, false);
-            emit toggle_push_button_clicked(MULTI_PAGE);
-
         }
         else{
             set_page_mode(QPdfView::PageMode::SinglePage, true);
-            emit toggle_push_button_clicked(SINGLE_PAGE);
         }
         toggle_event_overlay_widget();
     });
