@@ -25,7 +25,7 @@ private:
     QFileDialog *file_dialog;
 
     void set_connects();
-    void open(const QUrl file_location);
+    void open_file(const QUrl url);
     void make_page(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name);
     void make_button(const QString &name);
 

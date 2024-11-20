@@ -39,18 +39,18 @@ void Main_Window::load_push_button_clicked(){
         file_dialog->setMimeTypeFilters({"application/pdf"});  // pdf 문서만 표시
     }
     if(file_dialog->exec() == QDialog::Accepted){
-        const QUrl file = file_dialog->selectedUrls().constFirst();
-        if(file.isValid()){
-            open(file);
+        const QUrl url = file_dialog->selectedUrls().constFirst();
+        if(url.isValid()){
+            open_file(url);
         }
     }
 }
 
-void Main_Window::open(const QUrl file_location){
-    if(file_location.isLocalFile()){
-        Pdf_Viewer_Widget *pdf_viewer_widget = new Pdf_Viewer_Widget(file_location, this);
-        make_page(pdf_viewer_widget, file_location.fileName());
-        make_button(file_location.fileName());
+void Main_Window::open_file(const QUrl url){
+    if(url.isLocalFile()){
+        Pdf_Viewer_Widget *pdf_viewer_widget = new Pdf_Viewer_Widget(url, this);
+        make_page(pdf_viewer_widget, url.fileName());
+        make_button(url.fileName());
     }
     else{
         qDebug() << "failed to open";
@@ -93,6 +93,7 @@ void Main_Window::make_button(const QString &name){
         if(widget){
             ui->stacked_widget->setCurrentWidget(widget);
 
+            // 디버그 코드
             qDebug() << ui->stacked_widget->currentWidget();
             qDebug() << ui->stacked_widget->currentIndex();
         }

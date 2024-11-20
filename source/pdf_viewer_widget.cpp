@@ -13,8 +13,8 @@
 #include <QStackedLayout>
 #include <QTimer>
 
-Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &pdf_location, QWidget *parent)
-    : pdf_location(pdf_location), QWidget(parent)
+Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
+    : url(url), QWidget(parent)
     , ui(new Ui::Pdf_Viewer_Widget)
     , page_selector(new Page_Selector), zoom_selector(new Zoom_Selector)
     , event_overlay_widget(new Event_Overlay_Widget(nullptr))
@@ -125,7 +125,7 @@ void Pdf_Viewer_Widget::set_connects(){
 void Pdf_Viewer_Widget::set_pdf_viewer(){
     // pdf에 표시할 문서를 설정
     pdf_view->setDocument(pdf_document);
-    pdf_document->load(pdf_location.toLocalFile());
+    pdf_document->load(url.toLocalFile());
 
     // pdf 설정
     pdf_page_navigator = pdf_view->pageNavigator();

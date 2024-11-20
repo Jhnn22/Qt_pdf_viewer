@@ -27,7 +27,7 @@ class Pdf_Viewer_Widget : public QWidget
     Q_OBJECT
 
 public:
-    Pdf_Viewer_Widget(const QUrl &pdf_location, QWidget *parent = nullptr);
+    Pdf_Viewer_Widget(const QUrl &url, QWidget *parent = nullptr);
     ~Pdf_Viewer_Widget();
 
 signals:
@@ -44,7 +44,7 @@ private:
     QPdfPageNavigator *pdf_page_navigator;      // pdf의 페이지 탐색
     QStackedLayout *stacked_layout;             // 위젯 겹치기를 위한 레이아웃
 
-    QUrl pdf_location;
+    QUrl url;
     int prev_page_index, current_page_index;
     qreal current_zoom_factor;
 
