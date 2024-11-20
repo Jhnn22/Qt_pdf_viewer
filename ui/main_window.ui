@@ -78,7 +78,7 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item alignment="Qt::AlignmentFlag::Qt::AlignmentFlag::AlignTop">
+        <item>
          <widget class="QWidget" name="widget" native="true">
           <property name="styleSheet">
            <string notr="true"/>
@@ -100,7 +100,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QPushButton" name="push_button">
+            <widget class="QPushButton" name="load_push_button">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -120,7 +120,7 @@
               </size>
              </property>
              <property name="text">
-              <string>open file</string>
+              <string>불러오기</string>
              </property>
             </widget>
            </item>

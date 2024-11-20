@@ -3,7 +3,6 @@
 
 #include "pdf_viewer_widget.h"
 
-#include <QPushButton>
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -15,6 +14,12 @@ Main_Window::Main_Window(QWidget *parent)
 {
     ui->setupUi(this);
 
+    file_list_layout = qobject_cast<QVBoxLayout*>(ui->widget->layout());
+    if(file_list_layout){
+        file_list_layout->setContentsMargins(0, 0, 0, 0);
+        file_list_layout->setAlignment(Qt::AlignTop);
+    }
+
     set_connects();
 }
 
@@ -24,19 +29,19 @@ Main_Window::~Main_Window()
 }
 
 void Main_Window::set_connects(){
-    connect(ui->push_button, &QPushButton::clicked, this, &Main_Window::push_button_clicked);
+    connect(ui->load_push_button, &QPushButton::clicked, this, &Main_Window::load_push_button_clicked);
 }
 
-void Main_Window::push_button_clicked(){
+void Main_Window::load_push_button_clicked(){
     if(file_dialog == nullptr){
         file_dialog = new QFileDialog(this, tr("Pdf 불러오기"), QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));   // 기본 경로 : 다운로드
         file_dialog->setAcceptMode(QFileDialog::AcceptOpen);   // 열기 모드
         file_dialog->setMimeTypeFilters({"application/pdf"});  // pdf 문서만 표시
     }
     if(file_dialog->exec() == QDialog::Accepted){
-        const QUrl target = file_dialog->selectedUrls().constFirst();
-        if(target.isValid()){
-            open(target);
+        const QUrl file = file_dialog->selectedUrls().constFirst();
+        if(file.isValid()){
+            open(file);
         }
     }
 }
@@ -55,8 +60,8 @@ void Main_Window::open(const QUrl file_location){
 void Main_Window::make_page(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name){
     QWidget *page = new QWidget();
     page->setObjectName(name);
-
     QVBoxLayout *vertical_layout = new QVBoxLayout();
+    vertical_layout->setContentsMargins(0, 0, 0, 0);
     vertical_layout->addWidget(pdf_viewer_widget);
     page->setLayout(vertical_layout);
 
@@ -78,15 +83,15 @@ void Main_Window::make_page(Pdf_Viewer_Widget *pdf_viewer_widget, const QString 
 
 void Main_Window::make_button(const QString &name){
     QPushButton *button = new QPushButton();
+    button->setFixedSize(150, 30);
     button->setText(name);
 
-    QVBoxLayout* lay = qobject_cast<QVBoxLayout*>(ui->widget->layout());
-    lay->insertWidget(lay->count() - 1, button);
+    file_list_layout->insertWidget(file_list_layout->count() - 1, button);
 
     connect(button, &QPushButton::clicked, this, [this, name]{
-        QWidget *target_widget = ui->stacked_widget->findChild<QWidget*>(name);
-        if(target_widget){
-            ui->stacked_widget->setCurrentWidget(target_widget);
+        QWidget *widget = ui->stacked_widget->findChild<QWidget*>(name);
+        if(widget){
+            ui->stacked_widget->setCurrentWidget(widget);
 
             qDebug() << ui->stacked_widget->currentWidget();
             qDebug() << ui->stacked_widget->currentIndex();

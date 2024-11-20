@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-class QPushButton;
+class QVBoxLayout;
 class QFileDialog;
 class Pdf_Viewer_Widget;
 
@@ -21,7 +21,7 @@ public:
 
 private:
     Ui::Main_Window *ui;
-    QPushButton *fixed_button;
+    QVBoxLayout *file_list_layout;
     QFileDialog *file_dialog;
 
     void set_connects();
@@ -30,7 +30,7 @@ private:
     void make_button(const QString &name);
 
 private slots:
-    void push_button_clicked();
+    void load_push_button_clicked();
 
 };
 
