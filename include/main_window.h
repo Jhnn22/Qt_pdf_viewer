@@ -3,7 +3,9 @@
 
 #include <QMainWindow>
 
+class QPushButton;
 class QFileDialog;
+class Pdf_Viewer_Widget;
 
 namespace Ui {
 class Main_Window;
@@ -19,13 +21,17 @@ public:
 
 private:
     Ui::Main_Window *ui;
+    QPushButton *fixed_button;
     QFileDialog *file_dialog;
 
-    void set_menu_bar();
+    void set_connects();
     void open(const QUrl file_location);
+    void make_page(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name);
+    void make_button(const QString &name);
 
 private slots:
-    void action_open_file_triggered();
+    void push_button_clicked();
+
 };
 
 #endif // MAIN_WINDOW_H

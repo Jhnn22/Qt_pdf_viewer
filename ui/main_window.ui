@@ -14,39 +14,157 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="central_widget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QMdiArea" name="mdi_area">
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+     <widget class="QScrollArea" name="scroll_area">
+      <property name="minimumSize">
+       <size>
+        <width>150</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>150</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Shadow::Sunken</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
       </property>
-      <property name="viewMode">
-       <enum>QMdiArea::ViewMode::SubWindowView</enum>
+      <property name="widgetResizable">
+       <bool>true</bool>
       </property>
+      <widget class="QWidget" name="scroll_area_widget_contents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>150</width>
+         <height>561</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item alignment="Qt::AlignmentFlag::Qt::AlignmentFlag::AlignTop">
+         <widget class="QWidget" name="widget" native="true">
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="push_button">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>150</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>open file</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="stacked_widget">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Shadow::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page"/>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="status_bar"/>
   <widget class="QMenuBar" name="menu_bar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_file">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="action_open_file"/>
-   </widget>
-   <addaction name="menu_file"/>
   </widget>
   <action name="action_open_file">
    <property name="text">
