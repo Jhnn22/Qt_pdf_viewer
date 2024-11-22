@@ -1,124 +1,106 @@
 #include "pdf_viewer_widget.h"
 #include "./ui_pdf_viewer_widget.h"
 
-#include "page_selector.h"
-#include "zoom_selector.h"
-#include "event_overlay_widget.h"
-
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QPdfDocument>
 #include <QPdfPageNavigator>
 #include <QScrollBar>
-#include <QStackedLayout>
 #include <QTimer>
 
 Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
     : url(url), QWidget(parent)
     , ui(new Ui::Pdf_Viewer_Widget)
-    , page_selector(new Page_Selector), zoom_selector(new Zoom_Selector)
-    , event_overlay_widget(new Event_Overlay_Widget(nullptr))
     , pdf_view(new QPdfView(this)), pdf_document(new QPdfDocument(this))
+    , using_tool_bar(false)
 {
     ui->setupUi(this);
-    ui->pointing_push_button->setEnabled(false);
-    ui->drawing_push_button->setEnabled(false);
 
-    set_connects();
     set_pdf_viewer();
-    set_stacked_layout();
+    set_connects();
 }
 
 Pdf_Viewer_Widget::~Pdf_Viewer_Widget()
 {
-    delete page_selector;
-    delete zoom_selector;
-    delete event_overlay_widget;
     delete pdf_view;
     delete pdf_document;
     delete ui;
 }
 
-void Pdf_Viewer_Widget::set_connects(){
-    // 페이지 관리--------------------------------------------------------------
-    // 페이지 이동
-    pdf_page_navigator = pdf_view->pageNavigator();
-    connect(ui->prev_page_push_button, &QPushButton::clicked, this, [this](){
-        current_page_index = pdf_page_navigator->currentPage();
-        page_selector->page_select_with_prev_page_push_button(current_page_index);
-    });
-    connect(ui->next_page_push_button, &QPushButton::clicked, this, [this](){
-        current_page_index = pdf_page_navigator->currentPage();
-        page_selector->page_select_with_next_page_push_button(current_page_index);
-    });
-    connect(ui->page_line_edit, &QLineEdit::returnPressed, this, [this](){
-        QString input_text = ui->page_line_edit->text();
-        page_selector->page_select_with_page_line_edit(input_text);
-    });
-    // 페이지 적용 및 표시
-    connect(page_selector, &Page_Selector::page_changed, this, [this](const int changed_page_index, const QString &changed_text){
-        if(changed_page_index < 0){
-            ui->page_line_edit->setText(QString::number(pdf_page_navigator->currentPage() + 1)); // 잘못된 입력인 경우, 현재 페이지를 표시
-        }
-        else{
-            pdf_page_navigator->jump(changed_page_index, {}, pdf_page_navigator->currentZoom());
-            ui->page_line_edit->setText(changed_text);
-        }
-        // event_overlay_widget이 겹쳐진 상태에서의 포커스 설정
-        if(event_overlay_widget->parent() == this){
-            event_overlay_widget->setFocus();
-        }
+int Pdf_Viewer_Widget::get_current_page_index(){
+    return pdf_page_navigator->currentPage();
+}
 
-    });
+int Pdf_Viewer_Widget::get_total_page_index(){
+    return pdf_document->pageCount() - 1;
+}
+
+void Pdf_Viewer_Widget::page_changed(const int changed_page_index){
+    using_tool_bar = true;
+
+    pdf_page_navigator->jump(changed_page_index, {}, pdf_page_navigator->currentZoom());
+    emit update_page_info();
+
+    using_tool_bar = false;
+}
+
+qreal Pdf_Viewer_Widget::get_current_zoom_factor(){
+    return pdf_view->zoomFactor();
+}
+
+void Pdf_Viewer_Widget::zoom_changed(const qreal changed_zoom_factor){
+    QScrollBar *h = pdf_view->horizontalScrollBar();
+    QScrollBar *v = pdf_view->verticalScrollBar();
+
+    int h_value = h->value(); int h_max_value = h->maximum();
+    int v_value = v->value(); int v_max_value = v->maximum();
+
+    // 줌 설정
+    pdf_view->setZoomFactor(changed_zoom_factor);
+    emit update_zoom_info();
+
+    // 스크롤 값 계산
+    int new_h_max_value = h->maximum();
+    int new_v_max_value = v->maximum();
+
+    int new_h_value = (h_max_value == 0) ? 0 :
+                          qBound(0, static_cast<int>(h_value * (static_cast<qreal>(new_h_max_value) / h_max_value)), new_h_max_value);
+
+    int new_v_value = (v_max_value == 0) ? 0 :
+                          qBound(0, static_cast<int>(v_value * (static_cast<qreal>(new_v_max_value) / v_max_value)), new_v_max_value);
+
+    // 새로운 스크롤 값 적용
+    h->setValue(new_h_value);
+    v->setValue(new_v_value);
+}
+
+QPdfView::PageMode Pdf_Viewer_Widget::get_current_page_mode(){
+    return pdf_view->pageMode();
+}
+
+void Pdf_Viewer_Widget::page_mode_changed(QPdfView::PageMode changed_page_mode){
+    current_page_index = pdf_page_navigator->currentPage(); // 현재 페이지의 인덱스 저장
+
+    pdf_view->setPageMode(changed_page_mode);
+    // QTimer를 사용하여 약간의 지연 후 기존 페이지 위치로 이동
+    // QTimer::singleShot(30, this, [this](){
+    //     pdf_page_navigator->jump(current_page_index, {}, pdf_page_navigator->currentZoom());
+    // });
+}
+
+void Pdf_Viewer_Widget::set_connects(){
     // 스크롤 바 사용시 페이지 표시 업데이트
     prev_page_index = pdf_page_navigator->currentPage();
     connect(pdf_view->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](){
+        if(using_tool_bar){
+            return;
+        }
+
         current_page_index = pdf_page_navigator->currentPage();
         if(prev_page_index != current_page_index){
             prev_page_index = current_page_index;
-            ui->page_line_edit->setText(QString::number(current_page_index + 1));
+            emit update_page_info();
         }
-    });
-
-    // 화면 비율 관리--------------------------------------------------------------
-    // 화면 비율 선택
-    connect(ui->zoom_out_push_button, &QPushButton::clicked, this, [this](){
-        current_zoom_factor = pdf_view->zoomFactor();
-        zoom_selector->zoom_select_with_zoom_out_push_button(current_zoom_factor);
-    });
-    connect(ui->zoom_in_push_button, &QPushButton::clicked, this, [this](){
-        current_zoom_factor = pdf_view->zoomFactor();
-        zoom_selector->zoom_select_with_zoom_in_push_button(current_zoom_factor);
-    });
-    connect(ui->zoom_line_edit, &QLineEdit::returnPressed, this, [this](){
-        QString input_text = ui->zoom_line_edit->text();
-        zoom_selector->zoom_select_with_zoom_line_edit(input_text);
-    });
-    // 화면 비율 적용 및 표시
-    connect(zoom_selector, &Zoom_Selector::zoom_changed, this, [this](const qreal changed_zoom_factor, const QString &changed_text){
-        pdf_view->setZoomFactor(changed_zoom_factor);
-        ui->zoom_line_edit->setText(changed_text);
-        // event_overlay_widget이 겹쳐진 상태에서의 포커스 설정
-        if(event_overlay_widget->parent() == this){
-            event_overlay_widget->setFocus();
-        }
-    });
-
-    // 이벤트 처리 위젯 관리--------------------------------------------------------------
-    connect(ui->pointing_push_button, &QPushButton::clicked, this, [this](){
-        event_overlay_widget->set_paint_mode(POINTING);
-    });
-    connect(ui->drawing_push_button, &QPushButton::clicked, this, [this](){
-        event_overlay_widget->set_paint_mode(DRAWING);
-    });
-    connect(ui->toggle_push_button, &QPushButton::clicked, this, [this](){
-        if(pdf_view->pageMode() == QPdfView::PageMode::SinglePage){
-            set_page_mode(QPdfView::PageMode::MultiPage, false);
-        }
-        else{
-            set_page_mode(QPdfView::PageMode::SinglePage, true);
-        }
-        toggle_event_overlay_widget();
     });
 }
 
@@ -130,49 +112,8 @@ void Pdf_Viewer_Widget::set_pdf_viewer(){
     // pdf 설정
     pdf_page_navigator = pdf_view->pageNavigator();
     pdf_page_navigator->jump(0, {}, pdf_page_navigator->currentZoom());
-    page_selector->set_page_index_info(0, pdf_document->pageCount() - 1);
     pdf_view->setDocumentMargins(QMargins(0, 0, 0, 0));
     pdf_view->setPageMode(QPdfView::PageMode::MultiPage);
-    pdf_view->viewport()->installEventFilter(this); // 이벤트 설치
-
-    // pdf 초기 정보 표시
-    ui->page_line_edit->setText(QString::number(pdf_page_navigator->currentPage() + 1));
-    ui->total_page_label->setText(" / " + QString::number(pdf_document->pageCount()));
-    ui->zoom_line_edit->setText(QString::number(pdf_view->zoomFactor() * 100).append('%'));
+    this->layout()->addWidget(pdf_view);
 }
 
-void Pdf_Viewer_Widget::set_stacked_layout(){
-    stacked_layout = new QStackedLayout;
-    stacked_layout->setStackingMode(QStackedLayout::StackAll);
-    stacked_layout->addWidget(pdf_view);
-
-    ui->v_layout->addLayout(stacked_layout);
-}
-
-void Pdf_Viewer_Widget::set_page_mode(QPdfView::PageMode current_page_mode, bool enabled){
-    current_page_index = pdf_page_navigator->currentPage(); // 현재 페이지의 인덱스 저장
-    pdf_view->setPageMode(current_page_mode);
-
-    // QTimer를 사용하여 약간의 지연 후 기존 페이지 위치로 이동
-    QTimer::singleShot(30, this, [this](){
-        pdf_page_navigator->jump(current_page_index, {}, pdf_page_navigator->currentZoom());
-    });
-
-    ui->pointing_push_button->setEnabled(enabled);
-    ui->drawing_push_button->setEnabled(enabled);
-}
-
-void Pdf_Viewer_Widget::toggle_event_overlay_widget(){
-    if(stacked_layout->indexOf(event_overlay_widget) == -1){
-        // 위젯 추가
-        stacked_layout->addWidget(event_overlay_widget);
-        event_overlay_widget->show();
-        event_overlay_widget->raise();  // 위젯 위치를 최상위로 설정
-    }
-    else if(stacked_layout->indexOf(event_overlay_widget) != -1){
-        // 레이아웃으로부터 제거
-        stacked_layout->removeWidget(event_overlay_widget);
-        event_overlay_widget->setParent(nullptr);
-        event_overlay_widget->hide();
-    }
-}

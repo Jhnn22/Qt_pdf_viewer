@@ -165,10 +165,36 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
   </widget>
-  <action name="action_open_file">
+  <widget class="QToolBar" name="tool_bar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <action name="action_prev_page">
    <property name="text">
-    <string>Open File</string>
+    <string>&lt;</string>
+   </property>
+   <property name="toolTip">
+    <string>이전 페이지로 이동</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
