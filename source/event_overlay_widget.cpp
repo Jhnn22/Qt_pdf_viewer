@@ -1,11 +1,12 @@
 #include "event_overlay_widget.h"
 
 #include <QMouseEvent>
-#include <QPoint>
 #include <QPainter>
-#include <QPainterPath>
 #include <QPen>
+#include <QPainterPath>
 #include <QTimer>
+#include <QPointF>
+#include <algorithm>
 
 
 Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
@@ -39,22 +40,27 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
         prev_mouse_position = current_mouse_position = mouse_event->pos();
 
         if(current_paint_mode == DRAWING){
-            paths.push_back(QVector<QLine>());  // 새로운 벡터 추가
-
             // 투명도 초기화 및 타이머 일시 정지
             if(timer->isActive()){
                 color_opacity = 1.0;
                 update();
                 timer->stop();
             }
+
+            // 새로운 드로잉 경로 추가
+            path = new QPainterPath();
+            path->moveTo(current_mouse_position);
+            paths.push_back(path);
         }
     }
     else if(event->type() == QEvent::MouseMove && is_dragging){
         prev_mouse_position = current_mouse_position;
         current_mouse_position = mouse_event->pos();
 
-        if(current_paint_mode == DRAWING){
-            paths.last().push_back(QLine(prev_mouse_position, current_mouse_position));
+        if(current_paint_mode == DRAWING && path){
+            // 베지어 곡선 방식?
+            QPointF point = (prev_mouse_position + current_mouse_position) / 2.0;
+            path->quadTo(prev_mouse_position, point);
         }
     }
     else if(event->type() == QEvent::MouseButtonRelease && is_dragging){
@@ -93,13 +99,8 @@ void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
         painter.setPen(pen);
 
         for(const auto &path : paths){
-            if(!path.empty()){
-                QPainterPath painter_path;
-                painter_path.moveTo(path.first().p1());
-                for(const auto &line : path){
-                    painter_path.lineTo(line.p2());
-                }
-                painter.drawPath(painter_path);
+            if(path){
+                painter.drawPath(*path);
             }
         }
     }
@@ -116,8 +117,8 @@ void Event_Overlay_Widget::set_connects(){
     // 라인 삭제 설정--------------------------------------------------------------
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this](){
-        if(color_opacity > 0.01){
-            color_opacity -= 0.01;
+        if(color_opacity > 0.03){
+            color_opacity -= 0.03;
         }
         else{
             timer->stop();
@@ -128,7 +129,7 @@ void Event_Overlay_Widget::set_connects(){
     });
     connect(this, &Event_Overlay_Widget::drawing_finished, this, [this]{
         if(!is_dragging && !paths.empty()){
-            timer->start(10);
+            timer->start(16);   // ~60fps
         }
     });
 }

@@ -28,14 +28,11 @@ public:
     int get_current_page_index();
     int get_total_page_index();
     void page_changed(const int changed_page_index);
-    qreal get_current_zoom_factor();
-    void zoom_changed(const qreal changed_zoom_factor);
+    void set_page_mode(QPdfView::PageMode page_mode);
     QPdfView::PageMode get_current_page_mode();
-    void page_mode_changed(QPdfView::PageMode changed_page_mode);
 
 signals:
     void update_page_info();
-    void update_zoom_info();
 
 private:
     Ui::Pdf_Viewer_Widget *ui;
@@ -43,11 +40,14 @@ private:
     QPdfView *pdf_view;                         // pdf를 표시
     QPdfDocument *pdf_document;                 // pdf의 데이터를 제공
     QPdfPageNavigator *pdf_page_navigator;      // pdf의 페이지 탐색
-    QUrl url;
-    void set_connects();
-    void set_pdf_viewer();
 
+    QUrl url;
     bool using_tool_bar;
     int prev_page_index, current_page_index;
+    QPdfView::PageMode page_mode;
+    QPdfView::ZoomMode zoom_mode;
+
+    void set_connects();
+    void set_pdf_viewer();
 };
 #endif // PDF_VIEWER_WIDGET_H

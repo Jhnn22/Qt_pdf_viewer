@@ -9,6 +9,7 @@
 #define DRAWING 1
 #define DRAWING_WIDTH 5
 
+class QPainterPath;
 class QTimer;
 
 class Event_Overlay_Widget : public QWidget
@@ -27,11 +28,13 @@ signals:
     void drawing_finished();
 
 private:
+    QPainterPath *path;
+    QTimer *timer;
+
     QPoint prev_mouse_position, current_mouse_position;
     bool is_dragging;
     int prev_paint_mode, current_paint_mode;
-    QVector<QVector<QLine>> paths;
-    QTimer *timer;
+    QList<QPainterPath*> paths;
     qreal color_opacity;
 
     void set_connects();
