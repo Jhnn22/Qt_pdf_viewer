@@ -122,18 +122,8 @@ void Main_Window::set_connects(){
             page_line_edit_return_pressed(pdf_viewer_widget, input_text);
         }
     });
-    connect(action_prev_page, &QAction::triggered, this, [this](){
-        Pdf_Viewer_Widget *pdf_viewer_widget = ui->stacked_widget->currentWidget()->findChild<Pdf_Viewer_Widget*>();
-        if(pdf_viewer_widget){
-            action_prev_page_triggered(pdf_viewer_widget);
-        }
-    });
-    connect(action_next_page, &QAction::triggered, this, [this](){
-        Pdf_Viewer_Widget *pdf_viewer_widget = ui->stacked_widget->currentWidget()->findChild<Pdf_Viewer_Widget*>();
-        if(pdf_viewer_widget){
-            action_next_page_triggered(pdf_viewer_widget);
-        }
-    });
+    connect(action_prev_page, &QAction::triggered, this, &Main_Window::action_prev_page_triggered);
+    connect(action_next_page, &QAction::triggered, this, &Main_Window::action_next_page_triggered);
     // 페인트 이벤트
     connect(action_toggle, &QAction::triggered, this, [this](){
         QWidget *widget = ui->stacked_widget->currentWidget();
@@ -147,6 +137,10 @@ void Main_Window::set_connects(){
     connect(action_drawing, &QAction::triggered, this, [this](){
         event_overlay_widget->set_paint_mode(DRAWING);
     });
+}
+
+Pdf_Viewer_Widget *Main_Window::get_current_pdf_viewer_widget(){
+    return ui->stacked_widget->currentWidget()->findChild<Pdf_Viewer_Widget*>();
 }
 
 void Main_Window::load_push_button_clicked(){
@@ -231,15 +225,17 @@ void Main_Window::page_line_edit_return_pressed(Pdf_Viewer_Widget *pdf_viewer_wi
     page_line_edit->setText(QString::number(pdf_viewer_widget->get_current_page_index() + 1));
 }
 
-void Main_Window::action_prev_page_triggered(Pdf_Viewer_Widget *pdf_viewer_widget){
-    if(current_page_index > 0){
+void Main_Window::action_prev_page_triggered(){
+    Pdf_Viewer_Widget *pdf_viewer_widget = get_current_pdf_viewer_widget();
+    if(pdf_viewer_widget && current_page_index > 0){
         int prev_page_index = current_page_index - 1;
         pdf_viewer_widget->page_changed(prev_page_index);
     }
 }
 
-void Main_Window::action_next_page_triggered(Pdf_Viewer_Widget *pdf_viewer_widget){
-    if(current_page_index < total_page_index){
+void Main_Window::action_next_page_triggered(){
+    Pdf_Viewer_Widget *pdf_viewer_widget = get_current_pdf_viewer_widget();
+    if(pdf_viewer_widget && current_page_index < total_page_index){
         int next_page_index = current_page_index + 1;
         pdf_viewer_widget->page_changed(next_page_index);
     }

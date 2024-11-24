@@ -25,6 +25,13 @@ public:
     explicit Main_Window(QWidget *parent = nullptr);
     ~Main_Window();
 
+public slots:
+    void load_push_button_clicked();
+    void page_line_edit_return_pressed(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &input_text);
+    void action_prev_page_triggered();
+    void action_next_page_triggered();
+    void action_toggle_triggered(QWidget *widget);
+
 signals:
     void current_widget_changed();
 
@@ -44,16 +51,10 @@ private:
     void set_pdf_list();
     void set_tool_bar();
     void set_connects();
+    Pdf_Viewer_Widget *get_current_pdf_viewer_widget();
     void open_pdf(const QUrl &url);
     void make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name);
     void make_button(const QString &name);
-
-private slots:
-    void load_push_button_clicked();
-    void page_line_edit_return_pressed(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &input_text);
-    void action_prev_page_triggered(Pdf_Viewer_Widget *pdf_viewer_widget);
-    void action_next_page_triggered(Pdf_Viewer_Widget *pdf_viewer_widget);
-    void action_toggle_triggered(QWidget *widget);
 };
 
 #endif // MAIN_WINDOW_H
