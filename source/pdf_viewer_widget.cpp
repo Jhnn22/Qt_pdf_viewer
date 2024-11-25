@@ -30,7 +30,7 @@ Pdf_Viewer_Widget::~Pdf_Viewer_Widget()
 }
 
 int Pdf_Viewer_Widget::get_current_page_index(){
-    return pdf_page_navigator->currentPage();
+    return current_page_index;
 }
 
 int Pdf_Viewer_Widget::get_total_page_index(){
@@ -41,7 +41,8 @@ void Pdf_Viewer_Widget::page_changed(const int changed_page_index){
     using_tool_bar = true;
 
     pdf_page_navigator->jump(changed_page_index, {}, pdf_page_navigator->currentZoom());
-    emit update_page_info();
+    current_page_index = changed_page_index;
+    emit update_page_line_edit();
 
     using_tool_bar = false;
 }
@@ -64,7 +65,7 @@ void Pdf_Viewer_Widget::set_connects(){
         current_page_index = pdf_page_navigator->currentPage();
         if(prev_page_index != current_page_index){
             prev_page_index = current_page_index;
-            emit update_page_info();
+            emit update_page_line_edit();
         }
     });
 

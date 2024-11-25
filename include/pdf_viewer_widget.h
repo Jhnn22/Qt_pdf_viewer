@@ -24,7 +24,6 @@ class Pdf_Viewer_Widget : public QWidget
 public:
     Pdf_Viewer_Widget(const QUrl &url, QWidget *parent = nullptr);
     ~Pdf_Viewer_Widget();
-
     int get_current_page_index();
     int get_total_page_index();
     void page_changed(const int changed_page_index);
@@ -32,15 +31,13 @@ public:
     QPdfView::PageMode get_current_page_mode();
 
 signals:
-    void update_page_info();
+    void update_page_line_edit();
 
 private:
     Ui::Pdf_Viewer_Widget *ui;
-
     QPdfView *pdf_view;                         // pdf를 표시
     QPdfDocument *pdf_document;                 // pdf의 데이터를 제공
     QPdfPageNavigator *pdf_page_navigator;      // pdf의 페이지 탐색
-
     QUrl url;
     bool using_tool_bar;
     int prev_page_index, current_page_index;

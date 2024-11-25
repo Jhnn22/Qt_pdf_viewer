@@ -20,12 +20,14 @@ public:
 
     bool eventFilter(QObject *watched, QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
-public slots:
     void set_paint_mode(int mode);
+    int get_paint_mode();
 
 signals:
     void drawing_finished();
+    void screen_restore();
 
 private:
     QPainterPath *path;
@@ -33,7 +35,7 @@ private:
 
     QPoint prev_mouse_position, current_mouse_position;
     bool is_dragging;
-    int prev_paint_mode, current_paint_mode;
+    int current_paint_mode;
     QList<QPainterPath*> paths;
     qreal color_opacity;
 

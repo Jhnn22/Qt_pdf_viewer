@@ -12,7 +12,7 @@
 Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     : QWidget{parent}
     , is_dragging(false)
-    , prev_paint_mode(-1), current_paint_mode(-1)
+    , current_paint_mode(-1)
     , color_opacity(1.0)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents, false);  // 마우스 이벤트 받기
@@ -109,8 +109,11 @@ void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
 }
 
 void Event_Overlay_Widget::set_paint_mode(int paint_mode){
-    prev_paint_mode = current_paint_mode;
     current_paint_mode = paint_mode;
+}
+
+int Event_Overlay_Widget::get_paint_mode(){
+    return current_paint_mode;
 }
 
 void Event_Overlay_Widget::set_connects(){
@@ -132,4 +135,10 @@ void Event_Overlay_Widget::set_connects(){
             timer->start(16);   // ~60fps
         }
     });
+}
+
+void Event_Overlay_Widget::keyPressEvent(QKeyEvent *event){
+    if(event->key() == Qt::Key_Escape){
+        emit screen_restore();
+    }
 }
