@@ -27,7 +27,7 @@ public:
 
 signals:
     void drawing_finished();
-    void screen_restore();
+    void restore_from_full_screen();
 
 private:
     QPainterPath *path;

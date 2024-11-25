@@ -139,6 +139,6 @@ void Event_Overlay_Widget::set_connects(){
 
 void Event_Overlay_Widget::keyPressEvent(QKeyEvent *event){
     if(event->key() == Qt::Key_Escape){
-        emit screen_restore();
+        emit restore_from_full_screen();
     }
 }

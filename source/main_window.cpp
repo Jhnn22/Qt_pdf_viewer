@@ -12,13 +12,13 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QPointF>
+#include <QPushButton>
 
 Main_Window::Main_Window(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Main_Window)
     , pdf_dialog(nullptr)
     , event_overlay_widget(new Event_Overlay_Widget(nullptr))
-    , full_screen_widget(new QWidget(nullptr))
 {
     ui->setupUi(this);
     set_pdf_list();
@@ -72,20 +72,8 @@ void Main_Window::set_tool_bar(){
     action_next_page->setToolTip("다음 페이지로 이동");
 
     action_full_screen = new QAction(this);
-    action_full_screen->setText("F");
+    action_full_screen->setText("발표");
     action_full_screen->setToolTip("전체 화면");
-    action_full_screen->setShortcut(Qt::Key_F5);
-
-    // 페인트 이벤트
-    action_pointing = new QAction(this);
-    action_pointing->setText("P");
-    action_pointing->setToolTip("포인터");
-    action_pointing->setShortcut(Qt::Key_P);
-
-    action_drawing = new QAction(this);
-    action_drawing->setText("D");
-    action_drawing->setToolTip("드로잉");
-    action_drawing->setShortcut(Qt::Key_D);
 
     // 순서에 맞게 툴 바에 추가
     ui->tool_bar->addWidget(spacer);
@@ -93,26 +81,32 @@ void Main_Window::set_tool_bar(){
     ui->tool_bar->addAction(action_prev_page);
     ui->tool_bar->addAction(action_next_page);
     ui->tool_bar->addAction(action_full_screen);
-    ui->tool_bar->addAction(action_pointing);
-    ui->tool_bar->addAction(action_drawing);
 }
 
 void Main_Window::set_connects(){
-    // 파일 목록
+    // pdf 목록 불러오기
     connect(ui->load_push_button, &QPushButton::clicked, this, &Main_Window::load_push_button_clicked);
 
     // 툴바
-    // pdf 로드 및 변경 시 툴바 업데이트
-    connect(this, &Main_Window::current_widget_changed, this, [this](){
-        Pdf_Viewer_Widget *pdf_viewer_widget = ui->stacked_widget->currentWidget()->findChild<Pdf_Viewer_Widget*>();
-        if(pdf_viewer_widget){
-            current_page_index = pdf_viewer_widget->get_current_page_index();
-            page_line_edit->setText(QString::number(current_page_index + 1));
-            total_page_index = pdf_viewer_widget->get_total_page_index();
-            total_page_label->setText(QString::number(total_page_index + 1));
+    // pdf 추가 및 변경 시 정보 업데이트
+    connect(this, &Main_Window::current_widget_changed, this, [this](const QString &name){
+        focused_widget = hash.value(name);
+        focused_pdf_viewer_widget = focused_widget->findChild<Pdf_Viewer_Widget*>();
 
-            qDebug() << "추가/변경된 pdf의 현재 페이지:" << current_page_index + 1;
+        if(!focused_widget || !focused_pdf_viewer_widget){
+            return;
         }
+
+        current_page_index = focused_pdf_viewer_widget->get_current_page_index();
+        page_line_edit->setText(QString::number(current_page_index + 1));
+        total_page_index = focused_pdf_viewer_widget->get_total_page_index();
+        total_page_label->setText(QString::number(total_page_index + 1));
+        set_name(name);
+
+        qDebug() << "---------------------------------------------------"
+                 << "\n추가 또는 변경된 pdf의 정보"
+                 << "\n이름 :" << name
+                 << "\n위젯 :" << focused_widget;
     });
     // 페이지
     connect(page_line_edit, &QLineEdit::returnPressed, this, [this](){
@@ -122,10 +116,7 @@ void Main_Window::set_connects(){
     connect(action_prev_page, &QAction::triggered, this, &Main_Window::action_prev_page_triggered);
     connect(action_next_page, &QAction::triggered, this, &Main_Window::action_next_page_triggered);
     connect(action_full_screen, &QAction::triggered, this, &Main_Window::action_full_screen_triggered);
-    connect(event_overlay_widget, &Event_Overlay_Widget::screen_restore, this, &Main_Window::screen_restore);
-
-    connect(action_pointing, &QAction::triggered, this, &Main_Window::action_pointing_triggered);
-    connect(action_drawing, &QAction::triggered, this, &Main_Window::action_drawing_triggered);
+    connect(event_overlay_widget, &Event_Overlay_Widget::restore_from_full_screen, this, &Main_Window::restore_from_full_screen);
 }
 
 void Main_Window::load_push_button_clicked(){
@@ -145,12 +136,22 @@ void Main_Window::load_push_button_clicked(){
 void Main_Window::open_pdf(const QUrl &url){
     if(url.isLocalFile()){
         Pdf_Viewer_Widget *pdf_viewer_widget = new Pdf_Viewer_Widget(url, this);
-        make_widget(pdf_viewer_widget, url.fileName());
-        make_button(url.fileName());
+
+        int num = 1;
+        QString original_name = url.fileName().remove(".pdf");
+        QString name = original_name;
+        while(hash.contains(name)){
+            name = QString("%1(%2)").arg(original_name).arg(num++);
+        }
+
+        make_widget(pdf_viewer_widget, name);
+        make_button(name);
+
+        emit current_widget_changed(name);
 
         connect(pdf_viewer_widget, &Pdf_Viewer_Widget::update_page_line_edit, this, [this, pdf_viewer_widget](){
             current_page_index = pdf_viewer_widget->get_current_page_index();
-            qDebug() << "기존 pdf의 현재 페이지:" << current_page_index + 1;
+            qDebug() << "현재 페이지:" << current_page_index + 1;
             page_line_edit->setText(QString::number(current_page_index + 1));
         });
     }
@@ -174,7 +175,7 @@ void Main_Window::make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QStrin
     ui->stacked_widget->addWidget(widget);
     ui->stacked_widget->setCurrentWidget(widget);
 
-    emit current_widget_changed();
+    hash.insert(name, widget);
 }
 
 void Main_Window::make_button(const QString &name){
@@ -184,90 +185,78 @@ void Main_Window::make_button(const QString &name){
     pdf_list_layout->addWidget(pdf_list_push_button);
 
     connect(pdf_list_push_button, &QPushButton::clicked, this, [this, name]{
-        QWidget *named_widget = ui->stacked_widget->findChild<QWidget*>(name);
-        if(named_widget){
-            QWidget *current_widget = ui->stacked_widget->currentWidget();
-            if(current_widget && current_widget != named_widget){
-                ui->stacked_widget->setCurrentWidget(named_widget);
+        QWidget *named_widget = hash.value(name);
+        QWidget *current_widget = ui->stacked_widget->currentWidget();
 
-                emit current_widget_changed();
-            }
+        if(!named_widget || !current_widget){
+            return;
+        }
+
+        if(current_widget != named_widget){
+            ui->stacked_widget->setCurrentWidget(named_widget);
+
+            emit current_widget_changed(name);
         }
     });
 }
 
+void Main_Window::set_name(const QString &name){
+    this->name = name;
+}
+
+QString Main_Window::get_name(){
+    return name;
+}
+
 void Main_Window::page_line_edit_return_pressed(const QString &input_text){
-    Pdf_Viewer_Widget *pdf_viewer_widget = ui->stacked_widget->currentWidget()->findChild<Pdf_Viewer_Widget*>();
-    if(pdf_viewer_widget){
-        bool ok = false;
-        int index = input_text.toInt(&ok) - 1;
-        if(ok && index >= 0 && index <= total_page_index){
-            pdf_viewer_widget->page_changed(index);
-        }
-        page_line_edit->setText(QString::number(pdf_viewer_widget->get_current_page_index() + 1));
+    bool ok = false;
+    int index = input_text.toInt(&ok) - 1;
+    if(ok && index >= 0 && index <= total_page_index){
+        focused_pdf_viewer_widget->page_changed(index);
     }
+    page_line_edit->setText(QString::number(focused_pdf_viewer_widget->get_current_page_index() + 1));
 }
 
 void Main_Window::action_prev_page_triggered(){
-    Pdf_Viewer_Widget *pdf_viewer_widget = ui->stacked_widget->currentWidget()->findChild<Pdf_Viewer_Widget*>();
-    if(pdf_viewer_widget && current_page_index > 0){
+    if(current_page_index > 0){
         int prev_page_index = current_page_index - 1;
-        pdf_viewer_widget->page_changed(prev_page_index);
+        focused_pdf_viewer_widget->page_changed(prev_page_index);
     }
 }
 
 void Main_Window::action_next_page_triggered(){
-    Pdf_Viewer_Widget *pdf_viewer_widget = ui->stacked_widget->currentWidget()->findChild<Pdf_Viewer_Widget*>();
-    if(pdf_viewer_widget && current_page_index < total_page_index){
+    if(current_page_index < total_page_index){
         int next_page_index = current_page_index + 1;
-        pdf_viewer_widget->page_changed(next_page_index);
+        focused_pdf_viewer_widget->page_changed(next_page_index);
     }
 }
 
 void Main_Window::action_full_screen_triggered(){
-    full_screen_widget = ui->stacked_widget->currentWidget();
-    if(full_screen_widget){
-        pdf_viewer_widget = full_screen_widget->findChild<Pdf_Viewer_Widget*>();
-        if(pdf_viewer_widget){
-            pdf_viewer_widget->set_page_mode(QPdfView::PageMode::SinglePage);
-        }
-        else{
-            qDebug() << "no pdf document is open";
-            return;
-        }
+    focused_pdf_viewer_widget->set_page_mode(QPdfView::PageMode::SinglePage);
 
-        full_screen_widget->layout()->addWidget(event_overlay_widget);
-        event_overlay_widget->show();
-        event_overlay_widget->raise();
+    focused_widget->layout()->addWidget(event_overlay_widget);
+    event_overlay_widget->show();
+    event_overlay_widget->raise();
 
-        ui->stacked_widget->removeWidget(full_screen_widget);
-        ui->stacked_widget->setCurrentIndex(0);
-        this->hide();
-        full_screen_widget->setParent(nullptr);
-        full_screen_widget->showFullScreen();
-        event_overlay_widget->setFocus();
-    }
+    ui->stacked_widget->removeWidget(focused_widget);
+    ui->stacked_widget->setCurrentIndex(0);
+    this->hide();
+    focused_widget->setParent(nullptr);
+    focused_widget->showFullScreen();
+    event_overlay_widget->setFocus();
 }
 
-void Main_Window::screen_restore(){
-    pdf_viewer_widget->set_page_mode(QPdfView::PageMode::MultiPage);
-    full_screen_widget->layout()->removeWidget(event_overlay_widget);
+void Main_Window::restore_from_full_screen(){
+    focused_pdf_viewer_widget->set_page_mode(QPdfView::PageMode::MultiPage);
+
+    focused_widget->layout()->removeWidget(event_overlay_widget);
     event_overlay_widget->setParent(nullptr);
     event_overlay_widget->set_paint_mode(-1);
     event_overlay_widget->hide();
 
     this->show();
-    ui->stacked_widget->addWidget(full_screen_widget);
-    ui->stacked_widget->setCurrentWidget(full_screen_widget);
-    full_screen_widget->setFocus();
+    ui->stacked_widget->addWidget(focused_widget);
+    ui->stacked_widget->setCurrentWidget(focused_widget);
 
-    emit current_widget_changed();
-}
-
-void Main_Window::action_pointing_triggered(){
-    event_overlay_widget->set_paint_mode(POINTING);
-}
-
-void Main_Window::action_drawing_triggered(){
-    event_overlay_widget->set_paint_mode(DRAWING);
+    emit current_widget_changed(name);
 }
