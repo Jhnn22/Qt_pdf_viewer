@@ -27,11 +27,30 @@ Main_Window::Main_Window(QWidget *parent)
     set_pdf_list();
     set_tool_bar();
     set_connects();
+
 }
 
 Main_Window::~Main_Window()
 {
     delete ui;
+}
+
+bool Main_Window::eventFilter(QObject *obj, QEvent *event){
+    if(event->type() == QEvent::Enter){
+        QWidget *widget = qobject_cast<QWidget*>(obj);
+        if(widget){
+            hash_2.value(widget)->setVisible(true);
+        }
+    }
+    else if(event->type() == QEvent::Leave){
+        QWidget *widget = qobject_cast<QWidget*>(obj);
+        if(widget){
+            hash_2.value(widget)->setVisible(false);
+        }
+    }
+    emit f();
+
+    return QWidget::eventFilter(obj, event);
 }
 
 void Main_Window::set_pdf_list(){
@@ -142,11 +161,11 @@ void Main_Window::open_pdf(const QUrl &url){
     if(url.isLocalFile()){
         Pdf_Viewer_Widget *pdf_viewer_widget = new Pdf_Viewer_Widget(url, this);
 
-        int num = 1;
+        int num = 2;
         QString original_name = url.fileName().remove(".pdf");
         QString name = original_name;
         while(hash.contains(name)){
-            name = QString("%1(%2)").arg(original_name).arg(num++);
+            name = QString("%1_%2").arg(original_name).arg(num++);
         }
 
         make_widget(pdf_viewer_widget, name);
@@ -168,7 +187,6 @@ void Main_Window::open_pdf(const QUrl &url){
 
 void Main_Window::make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name){
     QWidget *widget = new QWidget(ui->stacked_widget);
-    widget->setObjectName(name);
 
     QStackedLayout *stacked_layout = new QStackedLayout(widget);
     stacked_layout->setStackingMode(QStackedLayout::StackAll);
@@ -184,26 +202,44 @@ void Main_Window::make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QStrin
 }
 
 void Main_Window::make_button(const QString &name){
-    QPushButton *button = new QPushButton();
+    QWidget *widget = new QWidget(ui->widget);
+    widget->installEventFilter(this);
+
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    QPushButton *button = new QPushButton(widget);
+    button->setMaximumWidth(150);
     button->setFixedHeight(30);
+    button->setObjectName(name);
 
-    // 마우스 오버 시 동적으로 추가 될 목록 제거 버튼
-    QPushButton *button_2= new QPushButton();
-    button_2->setFixedSize(50, 30);
+    QPushButton *button_2= new QPushButton(widget);
+    button_2->setText("✕");
+    button_2->setFixedSize(30, 30);
+    button_2->setStyleSheet(
+        "text-align: center;"
+    );
+    button_2->setVisible(false);
 
-    QHBoxLayout *horizontal_layout = new QHBoxLayout();
-    horizontal_layout->setContentsMargins(0, 0, 0, 0);
-    horizontal_layout->addWidget(button);
+    layout->addWidget(button);
+    layout->addWidget(button_2);
 
-    pdf_list_layout->addLayout(horizontal_layout);
+    widget->setLayout(layout);
 
-    // 레이아웃이 적용 된 이후의 버튼 사이즈를 사용
+    pdf_list_layout->addWidget(widget);
+
     QMetaObject::invokeMethod(this, [this, name, button]{
         int width = button->width();
-        QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 5);  // 여유 값 5
+        QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 10);  // 여유 값 10
         button->setText(elided_name);
     }, Qt::QueuedConnection);
 
+    connect(this, &Main_Window::f, this, [this, name, button](){
+        int width = button->width();
+        QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 10);
+        button->setText(elided_name);
+    });
     connect(button, &QPushButton::clicked, this, [this, name]{
         QWidget *named_widget = hash.value(name);
         QWidget *current_widget = ui->stacked_widget->currentWidget();
@@ -218,6 +254,11 @@ void Main_Window::make_button(const QString &name){
             emit current_widget_changed(name);
         }
     });
+    connect(button_2, &QPushButton::clicked, this, [this, button](){
+        qDebug() << button;
+    });
+
+    hash_2.insert(widget, button_2);
 }
 
 void Main_Window::set_name(const QString &name){

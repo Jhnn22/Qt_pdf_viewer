@@ -19,7 +19,6 @@ class Event_Overlay_Widget : public QWidget
 public:
     explicit Event_Overlay_Widget(QWidget *parent = nullptr);
 
-    bool eventFilter(QObject *watched, QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
 

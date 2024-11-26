@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 }
 
 void manual(Main_Window *w, const QString &message){
-    static const QRegularExpression re("^\\((\\d+),(\\d+)\\)$");
+    static const QRegularExpression re("^(\\d+),(\\d+)$");
     QRegularExpressionMatch match = re.match(message);
     if(match.hasMatch()){
         int x = match.captured(1).toInt();

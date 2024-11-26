@@ -25,8 +25,8 @@ include_directories(
 
 set(PROJECT_HEADERS
     include/pdf_viewer_widget.h
-    include/page_selector.h
-    include/zoom_selector.h
+
+
     include/main_window.h
     include/event_overlay_widget.h
     include/websocket_server.h
@@ -34,8 +34,8 @@ set(PROJECT_HEADERS
 
 set(PROJECT_SOURCES
     source/pdf_viewer_widget.cpp
-    source/page_selector.cpp
-    source/zoom_selector.cpp
+
+
     source/main_window.cpp
     source/event_overlay_widget.cpp
 )

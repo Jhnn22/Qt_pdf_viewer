@@ -6,8 +6,6 @@
 #include <QPainterPath>
 #include <QTimer>
 #include <QPointF>
-#include <algorithm>
-
 
 Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     : QWidget{parent}
@@ -21,58 +19,6 @@ Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
 
     set_connects();
-
-    installEventFilter(this);
-}
-
-bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
-    // 마우스 이벤트만 처리
-    if(event->type() != QEvent::MouseButtonPress && event->type() != QEvent::MouseMove && event->type() != QEvent::MouseButtonRelease){
-        return QWidget::eventFilter(watched, event);
-    }
-
-    // 마우스 이벤트로의 타입 변환
-    QMouseEvent *mouse_event = static_cast<QMouseEvent*>(event);
-
-    // 이벤트 처리
-    if(event->type() == QEvent::MouseButtonPress && mouse_event->button() == Qt::LeftButton){
-        is_dragging = true;
-        prev_mouse_position = current_mouse_position = mouse_event->pos();
-
-        if(current_paint_mode == DRAWING){
-            // 투명도 초기화 및 타이머 일시 정지
-            if(timer->isActive()){
-                color_opacity = 1.0;
-                update();
-                timer->stop();
-            }
-
-            // 새로운 드로잉 경로 추가
-            path = new QPainterPath();
-            path->moveTo(current_mouse_position);
-            paths.push_back(path);
-        }
-    }
-    else if(event->type() == QEvent::MouseMove && is_dragging){
-        prev_mouse_position = current_mouse_position;
-        current_mouse_position = mouse_event->pos();
-
-        if(current_paint_mode == DRAWING && path){
-            // 베지어 곡선 방식?
-            QPointF point = (prev_mouse_position + current_mouse_position) / 2.0;
-            path->quadTo(prev_mouse_position, point);
-        }
-    }
-    else if(event->type() == QEvent::MouseButtonRelease && is_dragging){
-        is_dragging = false;
-
-        if(current_paint_mode == DRAWING){
-            emit drawing_finished();
-        }
-    }
-    // update();
-
-    return QWidget::eventFilter(watched, event);
 }
 
 void Event_Overlay_Widget::paintEvent(QPaintEvent *event){

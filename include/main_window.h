@@ -13,6 +13,7 @@ class QLineEdit;
 class QLabel;
 class QAction;
 class QPushButton;
+class QHBoxLayout;
 
 namespace Ui {
 class Main_Window;
@@ -26,6 +27,7 @@ public:
     explicit Main_Window(QWidget *parent = nullptr);
     ~Main_Window();
 
+    bool eventFilter(QObject *obj, QEvent *event) override;
     QString get_name();
 
 public slots:
@@ -40,6 +42,7 @@ public slots:
 
 signals:
     void current_widget_changed(const QString &name);
+    void f();
 
 private:
     Ui::Main_Window *ui;
@@ -53,6 +56,7 @@ private:
     QAction *action_prev_page, *action_next_page, *action_full_screen;
     int current_page_index, total_page_index;
     QHash<QString, QWidget*> hash;
+    QHash<QWidget*, QPushButton*> hash_2;
     QString name;
 
     void set_pdf_list();
