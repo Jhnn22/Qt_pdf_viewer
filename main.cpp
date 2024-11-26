@@ -4,6 +4,8 @@
 #include <QApplication>
 #include <QThread>
 
+#include <QRegularExpression>
+
 void manual(Main_Window *w, const QString &message);
 
 int main(int argc, char *argv[])
@@ -26,9 +28,7 @@ int main(int argc, char *argv[])
     });
 
     QObject::connect(server, &WebSocketServer::message_received, &w, [&w](const QString &message){
-        qDebug() << message;
         manual(&w, message);
-
     });
 
     serverThread->start();
@@ -37,6 +37,25 @@ int main(int argc, char *argv[])
 }
 
 void manual(Main_Window *w, const QString &message){
-    if(message == "left")       w->action_prev_page_triggered();
-    else if(message == "right") w->action_next_page_triggered();
+    static const QRegularExpression re("^\\((\\d+),(\\d+)\\)$");
+    QRegularExpressionMatch match = re.match(message);
+    if(match.hasMatch()){
+        int x = match.captured(1).toInt();
+        int y = match.captured(2).toInt();
+        w->set_pos(x, y);
+
+        return;
+    }
+
+    if(message == "left"){
+        w->action_prev_page_triggered();
+    }
+    else if(message == "right"){
+        w->action_next_page_triggered();
+    }
+    else if(message == "point" || message == "draw"){
+        w->set_paint_mode(
+            message == "point" ? 0 : 1 // 0: POINTING, 1: DRAWING
+        );
+    }
 }

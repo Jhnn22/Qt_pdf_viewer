@@ -11,11 +11,11 @@
 class QPdfDocument;
 class QPdfPageNavigator;
 
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class Pdf_Viewer_Widget;
-}
-QT_END_NAMESPACE
+// QT_BEGIN_NAMESPACE
+// namespace Ui {
+// class Pdf_Viewer_Widget;
+// }
+// QT_END_NAMESPACE
 
 class Pdf_Viewer_Widget : public QWidget
 {
@@ -34,7 +34,7 @@ signals:
     void update_page_line_edit();
 
 private:
-    Ui::Pdf_Viewer_Widget *ui;
+    // Ui::Pdf_Viewer_Widget *ui;
     QPdfView *pdf_view;                         // pdf를 표시
     QPdfDocument *pdf_document;                 // pdf의 데이터를 제공
     QPdfPageNavigator *pdf_page_navigator;      // pdf의 페이지 탐색

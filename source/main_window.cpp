@@ -104,9 +104,9 @@ void Main_Window::set_connects(){
         set_name(name);
 
         qDebug() << "---------------------------------------------------"
-                 << "\n추가 또는 변경된 pdf의 정보"
-                 << "\n이름 :" << name
-                 << "\n위젯 :" << focused_widget;
+                 << "\nloaded or changed widget info"
+                 << "\nname  :" << name
+                 << "\nwidget:" << focused_widget;
     });
     // 페이지
     connect(page_line_edit, &QLineEdit::returnPressed, this, [this](){
@@ -121,7 +121,7 @@ void Main_Window::set_connects(){
 
 void Main_Window::load_push_button_clicked(){
     if(pdf_dialog == nullptr){
-        pdf_dialog = new QFileDialog(this, tr("Pdf 불러오기"), QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));   // 기본 경로 : 다운로드
+        pdf_dialog = new QFileDialog(this, tr("open pdf"), QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));   // 기본 경로 : 다운로드
         pdf_dialog->setAcceptMode(QFileDialog::AcceptOpen);   // 열기 모드
         pdf_dialog->setMimeTypeFilters({"application/pdf"});  // pdf 문서만 표시
     }
@@ -151,7 +151,7 @@ void Main_Window::open_pdf(const QUrl &url){
 
         connect(pdf_viewer_widget, &Pdf_Viewer_Widget::update_page_line_edit, this, [this, pdf_viewer_widget](){
             current_page_index = pdf_viewer_widget->get_current_page_index();
-            qDebug() << "현재 페이지:" << current_page_index + 1;
+            qDebug() << "current page:" << current_page_index + 1;
             page_line_edit->setText(QString::number(current_page_index + 1));
         });
     }
@@ -259,4 +259,12 @@ void Main_Window::restore_from_full_screen(){
     ui->stacked_widget->setCurrentWidget(focused_widget);
 
     emit current_widget_changed(name);
+}
+
+void Main_Window::set_paint_mode(int paint_mode){
+    event_overlay_widget->set_paint_mode(paint_mode);
+}
+
+void Main_Window::set_pos(const int x, const int y){
+    event_overlay_widget->set_pos(x, y);
 }

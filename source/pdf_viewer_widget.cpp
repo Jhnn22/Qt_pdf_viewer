@@ -1,5 +1,5 @@
 #include "pdf_viewer_widget.h"
-#include "./ui_pdf_viewer_widget.h"
+// #include "./ui_pdf_viewer_widget.h"
 
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -9,14 +9,15 @@
 #include <QMetaObject>
 #include <QMetaMethod>
 #include <QTimer>
+#include <QVBoxLayout>
 
 Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
     : url(url), QWidget(parent)
-    , ui(new Ui::Pdf_Viewer_Widget)
+    // , ui(new Ui::Pdf_Viewer_Widget)
     , pdf_view(new QPdfView(this)), pdf_document(new QPdfDocument(this))
     , using_tool_bar(false)
 {
-    ui->setupUi(this);
+    // ui->setupUi(this);
 
     set_pdf_viewer();
     set_connects();
@@ -26,7 +27,7 @@ Pdf_Viewer_Widget::~Pdf_Viewer_Widget()
 {
     delete pdf_view;
     delete pdf_document;
-    delete ui;
+    // delete ui;
 }
 
 int Pdf_Viewer_Widget::get_current_page_index(){
@@ -90,6 +91,10 @@ void Pdf_Viewer_Widget::set_pdf_viewer(){
     pdf_view->setDocumentMargins(QMargins(0, 0, 0, 0));
     pdf_view->setPageMode(QPdfView::PageMode::MultiPage);
     pdf_view->setZoomMode(QPdfView::ZoomMode::FitInView);
-    this->layout()->addWidget(pdf_view);
+    QVBoxLayout *vertical_layout = new QVBoxLayout(this);
+    vertical_layout->addWidget(pdf_view);
+    setLayout(vertical_layout);
+
+    // this->layout()->addWidget(pdf_view);
 }
 

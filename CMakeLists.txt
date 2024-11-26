@@ -41,7 +41,7 @@ set(PROJECT_SOURCES
 )
 
 set(PROJECT_UI
-    ui/pdf_viewer_widget.ui
+    # ui/pdf_viewer_widget.ui
     ui/main_window.ui
 )
 

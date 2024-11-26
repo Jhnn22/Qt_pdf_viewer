@@ -35,6 +35,8 @@ public slots:
     void action_next_page_triggered();
     void action_full_screen_triggered();
     void restore_from_full_screen();
+    void set_paint_mode(int paint_mode);
+    void set_pos(const int x, const int y);
 
 signals:
     void current_widget_changed(const QString &name);

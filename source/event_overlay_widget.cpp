@@ -70,7 +70,7 @@ bool Event_Overlay_Widget::eventFilter(QObject *watched, QEvent *event){
             emit drawing_finished();
         }
     }
-    update();
+    // update();
 
     return QWidget::eventFilter(watched, event);
 }
@@ -87,9 +87,9 @@ void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
     pen.setCapStyle(Qt::RoundCap);
     pen.setJoinStyle(Qt::BevelJoin);
 
-    if(current_paint_mode == POINTING && is_dragging){
+    if(current_paint_mode == POINTING){
         painter.setPen(pen);
-        painter.drawPoint(current_mouse_position);
+        painter.drawPoint(current_pos);
     }
     else if(current_paint_mode == DRAWING){
         // 투명도 설정
@@ -104,20 +104,44 @@ void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
             }
         }
     }
-
-    QWidget::paintEvent(event);
 }
 
 void Event_Overlay_Widget::set_paint_mode(int paint_mode){
     current_paint_mode = paint_mode;
+
+    QString str = current_paint_mode == POINTING ? "POINTING" : "DRAWING";
+    qDebug() << str;
 }
 
 int Event_Overlay_Widget::get_paint_mode(){
     return current_paint_mode;
 }
 
+void Event_Overlay_Widget::set_pos(const int x, const int y){
+    prev_pos = current_pos;
+    current_pos.setX(x); current_pos.setY(y);
+
+    // 드로잉 이벤트의 경우 경로 저장
+    if(current_paint_mode == DRAWING){
+        if(paths.empty()){
+            // 새로운 드로잉 경로 추가
+            path = new QPainterPath();
+            path->moveTo(current_pos);
+            paths.push_back(path);
+        }
+
+        QPointF mid_pos = (prev_pos + current_pos) / 2.0;
+        path->quadTo(prev_pos, mid_pos);
+    }
+
+    drawing_timeout_timer->start(DRAWING_TIMEOUT_MS);
+
+    update();
+}
+
 void Event_Overlay_Widget::set_connects(){
     // 라인 삭제 설정--------------------------------------------------------------
+    // 삭제
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this](){
         if(color_opacity > 0.03){
@@ -130,8 +154,10 @@ void Event_Overlay_Widget::set_connects(){
         }
         update();
     });
-    connect(this, &Event_Overlay_Widget::drawing_finished, this, [this]{
-        if(!is_dragging && !paths.empty()){
+    // 삭제를 위한 드로잉 이벤트 종료
+    drawing_timeout_timer = new QTimer(this);
+    connect(drawing_timeout_timer, &QTimer::timeout, this, [this](){
+        if(!paths.empty()){
             timer->start(16);   // ~60fps
         }
     });
