@@ -13,12 +13,9 @@
 
 Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
     : url(url), QWidget(parent)
-    // , ui(new Ui::Pdf_Viewer_Widget)
     , pdf_view(new QPdfView(this)), pdf_document(new QPdfDocument(this))
     , using_tool_bar(false)
 {
-    // ui->setupUi(this);
-
     set_pdf_viewer();
     set_connects();
 }
@@ -80,21 +77,22 @@ void Pdf_Viewer_Widget::set_connects(){
 }
 
 void Pdf_Viewer_Widget::set_pdf_viewer(){
-    // pdf에 표시할 문서를 설정
+    // pdf에 표시할 문서
     pdf_view->setDocument(pdf_document);
     pdf_document->load(url.toLocalFile());
 
-    // pdf 설정
+    // pdf
     pdf_page_navigator = pdf_view->pageNavigator();
     current_page_index = pdf_page_navigator->currentPage();
     pdf_page_navigator->jump(current_page_index, {}, pdf_page_navigator->currentZoom());
     pdf_view->setDocumentMargins(QMargins(0, 0, 0, 0));
     pdf_view->setPageMode(QPdfView::PageMode::MultiPage);
     pdf_view->setZoomMode(QPdfView::ZoomMode::FitInView);
+
+    // 레이아웃
     QVBoxLayout *vertical_layout = new QVBoxLayout(this);
+    vertical_layout->setContentsMargins(0, 0, 0, 0);
     vertical_layout->addWidget(pdf_view);
     setLayout(vertical_layout);
-
-    // this->layout()->addWidget(pdf_view);
 }
 

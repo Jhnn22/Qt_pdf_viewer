@@ -13,6 +13,9 @@
 #include <QStandardPaths>
 #include <QPointF>
 #include <QPushButton>
+#include <QHBoxLayout>
+#include <QMetaObject>
+#include <QMetaMethod>
 
 Main_Window::Main_Window(QWidget *parent)
     : QMainWindow(parent)
@@ -36,6 +39,8 @@ void Main_Window::set_pdf_list(){
     if(pdf_list_layout){
         pdf_list_layout->setContentsMargins(0, 0, 0, 0);
         pdf_list_layout->setAlignment(Qt::AlignTop);
+
+
     }
 }
 
@@ -179,12 +184,27 @@ void Main_Window::make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QStrin
 }
 
 void Main_Window::make_button(const QString &name){
-    QPushButton *pdf_list_push_button = new QPushButton();
-    pdf_list_push_button->setFixedSize(150, 30);
-    pdf_list_push_button->setText(name);
-    pdf_list_layout->addWidget(pdf_list_push_button);
+    QPushButton *button = new QPushButton();
+    button->setFixedHeight(30);
 
-    connect(pdf_list_push_button, &QPushButton::clicked, this, [this, name]{
+    // 마우스 오버 시 동적으로 추가 될 목록 제거 버튼
+    QPushButton *button_2= new QPushButton();
+    button_2->setFixedSize(50, 30);
+
+    QHBoxLayout *horizontal_layout = new QHBoxLayout();
+    horizontal_layout->setContentsMargins(0, 0, 0, 0);
+    horizontal_layout->addWidget(button);
+
+    pdf_list_layout->addLayout(horizontal_layout);
+
+    // 레이아웃이 적용 된 이후의 버튼 사이즈를 사용
+    QMetaObject::invokeMethod(this, [this, name, button]{
+        int width = button->width();
+        QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 5);  // 여유 값 5
+        button->setText(elided_name);
+    }, Qt::QueuedConnection);
+
+    connect(button, &QPushButton::clicked, this, [this, name]{
         QWidget *named_widget = hash.value(name);
         QWidget *current_widget = ui->stacked_widget->currentWidget();
 
