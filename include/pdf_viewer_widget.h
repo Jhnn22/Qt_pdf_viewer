@@ -17,7 +17,6 @@ class Pdf_Viewer_Widget : public QWidget
 
 public:
     Pdf_Viewer_Widget(const QUrl &url, QWidget *parent = nullptr);
-    ~Pdf_Viewer_Widget();
     int get_current_page_index();
     int get_total_page_index();
     void page_changed(const int changed_page_index);

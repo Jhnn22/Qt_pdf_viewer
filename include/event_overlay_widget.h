@@ -18,6 +18,7 @@ class Event_Overlay_Widget : public QWidget
     Q_OBJECT
 public:
     explicit Event_Overlay_Widget(QWidget *parent = nullptr);
+    ~Event_Overlay_Widget();
 
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;

@@ -21,6 +21,18 @@ Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     set_connects();
 }
 
+Event_Overlay_Widget::~Event_Overlay_Widget(){
+    if(path){
+        delete path;
+        path = nullptr;
+    }
+    if(!paths.empty()){
+        for(const auto *path : paths){
+            delete path;
+        }
+    }
+    paths.clear();
+}
 void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
     // painter 설정
     QPainter painter(this);
@@ -54,9 +66,6 @@ void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
 
 void Event_Overlay_Widget::set_paint_mode(int paint_mode){
     current_paint_mode = paint_mode;
-
-    QString str = current_paint_mode == POINTING ? "POINTING" : "DRAWING";
-    qDebug() << str;
 }
 
 int Event_Overlay_Widget::get_paint_mode(){

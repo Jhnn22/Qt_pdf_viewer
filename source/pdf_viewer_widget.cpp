@@ -1,5 +1,4 @@
 #include "pdf_viewer_widget.h"
-// #include "./ui_pdf_viewer_widget.h"
 
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -13,18 +12,11 @@
 
 Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
     : url(url), QWidget(parent)
-    , pdf_view(new QPdfView(this)), pdf_document(new QPdfDocument(this))
+    , pdf_view(new QPdfView(this)), pdf_document(new QPdfDocument(this)), pdf_page_navigator(new QPdfPageNavigator(this))
     , using_tool_bar(false)
 {
     set_pdf_viewer();
     set_connects();
-}
-
-Pdf_Viewer_Widget::~Pdf_Viewer_Widget()
-{
-    delete pdf_view;
-    delete pdf_document;
-    // delete ui;
 }
 
 int Pdf_Viewer_Widget::get_current_page_index(){

@@ -7,7 +7,6 @@
 class Pdf_Viewer_Widget;
 class Event_Overlay_Widget;
 
-class QVBoxLayout;
 class QFileDialog;
 class QLineEdit;
 class QLabel;
@@ -49,7 +48,6 @@ private:
     QWidget *focused_widget;
     Pdf_Viewer_Widget *focused_pdf_viewer_widget;
     Event_Overlay_Widget *event_overlay_widget;
-    QVBoxLayout *pdf_list_layout;
     QFileDialog *pdf_dialog;
     QLineEdit *page_line_edit;
     QLabel *total_page_label;
@@ -59,7 +57,6 @@ private:
     QHash<QWidget*, QPushButton*> hash_2;
     QString name;
 
-    void set_pdf_list();
     void set_tool_bar();
     void set_connects();
     void open_pdf(const QUrl &url);
