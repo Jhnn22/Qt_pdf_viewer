@@ -53,15 +53,15 @@ private:
     QLabel *total_page_label;
     QAction *action_prev_page, *action_next_page, *action_full_screen;
     int current_page_index, total_page_index;
-    QHash<QString, QWidget*> hash;
+    QHash<QString, QPair<QWidget*, QWidget*>> hash;
     QHash<QWidget*, QPushButton*> hash_2;
     QString name;
 
     void set_tool_bar();
     void set_connects();
     void open_pdf(const QUrl &url);
-    void make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name);
-    void make_button(const QString &name);
+    QWidget *make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name);
+    QWidget *make_button(const QString &name);
     void set_name(const QString &name);
 };
 

@@ -31,8 +31,6 @@ Main_Window::Main_Window(QWidget *parent)
 
 Main_Window::~Main_Window()
 {
-    qDeleteAll(hash);
-    qDeleteAll(hash_2);
     delete ui;
 }
 
@@ -113,7 +111,7 @@ void Main_Window::set_connects(){
             return;
         }
 
-        focused_widget = hash.value(name);
+        focused_widget = hash.value(name).first;
         if(focused_widget){
             focused_pdf_viewer_widget = focused_widget->findChild<Pdf_Viewer_Widget*>();
             if(focused_pdf_viewer_widget){
@@ -181,8 +179,8 @@ void Main_Window::open_pdf(const QUrl &url){
             name = QString("%1_%2").arg(original_name).arg(num++);
         }
 
-        make_widget(pdf_viewer_widget, name);
-        make_button(name);
+        hash.insert(name, {make_widget(pdf_viewer_widget, name), make_button(name)});
+
 
         emit current_widget_changed(name);
 
@@ -197,7 +195,7 @@ void Main_Window::open_pdf(const QUrl &url){
     }
 }
 
-void Main_Window::make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name){
+QWidget *Main_Window::make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QString &name){
     QWidget *widget = new QWidget(ui->stacked_widget);
     widget->setObjectName(name);
 
@@ -211,10 +209,10 @@ void Main_Window::make_widget(Pdf_Viewer_Widget *pdf_viewer_widget, const QStrin
     ui->stacked_widget->addWidget(widget);
     ui->stacked_widget->setCurrentWidget(widget);
 
-    hash.insert(name, widget);
+    return widget;
 }
 
-void Main_Window::make_button(const QString &name){
+QWidget *Main_Window::make_button(const QString &name){
     QWidget *widget = new QWidget(ui->widget);
     widget->installEventFilter(this);
 
@@ -231,7 +229,7 @@ void Main_Window::make_button(const QString &name){
     button_2->setFixedSize(30, 30);
     button_2->setStyleSheet(
         "text-align: center;"
-    );
+        );
     button_2->setVisible(false);
 
     layout->addWidget(button);
@@ -247,13 +245,13 @@ void Main_Window::make_button(const QString &name){
         button->setText(elided_name);
     }, Qt::QueuedConnection);
 
-    connect(this, &Main_Window::f, this, [this, name, button](){
+    QMetaObject::Connection connection_f = connect(this, &Main_Window::f, this, [this, name, button]{
         int width = button->width();
         QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 10);
         button->setText(elided_name);
     });
     connect(button, &QPushButton::clicked, this, [this, name]{
-        QWidget *named_widget = hash.value(name);
+        QWidget *named_widget = hash.value(name).first;
         QWidget *current_widget = ui->stacked_widget->currentWidget();
 
         if(named_widget && current_widget){
@@ -272,10 +270,11 @@ void Main_Window::make_button(const QString &name){
             return;
         }
     });
-    connect(button_2, &QPushButton::clicked, this, [this, name](){
-        QWidget *named_widget = hash.value(name);
+    connect(button_2, &QPushButton::clicked, this, [this, name, connection_f](){
+        disconnect(connection_f);
+
+        QWidget *named_widget = hash.value(name).first;
         if(named_widget){
-            hash.remove(name);
             ui->stacked_widget->removeWidget(named_widget);
             named_widget->deleteLater();
 
@@ -290,14 +289,25 @@ void Main_Window::make_button(const QString &name){
             return;
         }
 
-        // widget 지우기
-        // 아마 widget을 값복사로 가져와서 지우려 해서 계속 에러가 나는듯 하다...
-        // 별도의 .h + .ui 파일로 목록 버튼 클래스를 정의 + 이벤트 처리 추가를 하고 멤버변수로 선언해 가져다 써보자 -> 가장 확률이 높음...제발
-        // 정 안되면 버튼 구성을 바꿔보자
+        QWidget *named_widget_2 = hash.value(name).second;
+        if(named_widget_2){
+            ui->vertical_layout->removeWidget(named_widget_2);
+            named_widget_2->removeEventFilter(this);
+            named_widget_2->hide();
+            named_widget_2->deleteLater();
+        }
+        else{
+            qDebug() << "named_widget_2 is null or invalid";
+            return;
+        }
 
+        hash.remove(name);
+        hash_2.remove(named_widget_2);
     });
 
     hash_2.insert(widget, button_2);
+
+    return widget;
 }
 
 void Main_Window::set_name(const QString &name){
