@@ -10,7 +10,7 @@
 Event_Overlay_Widget::Event_Overlay_Widget(QWidget *parent)
     : QWidget{parent}
     , is_dragging(false)
-    , current_paint_mode(POINTING)
+    , current_paint_mode(-1)
     , color_opacity(1.0)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents, false);  // 마우스 이벤트 받기

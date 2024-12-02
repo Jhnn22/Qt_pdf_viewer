@@ -36,11 +36,15 @@ int main(int argc, char *argv[])
 }
 
 void manual(Main_Window *w, const QString &message){
-    static const QRegularExpression re("^\\((\\d+), (\\d+)\\)$");
+    static const QRegularExpression re("^(\\w+)\\((\\d+), (\\d+)\\)$");
     QRegularExpressionMatch match = re.match(message);
     if(match.hasMatch()){
-        int x = match.captured(1).toInt();
-        int y = match.captured(2).toInt();
+        QString str = match.captured(1);
+        w->set_paint_mode(str == "pointing" ? 0 : (str == "drawing" ? 1 : -1));
+        qDebug() << str;
+
+        int x = match.captured(2).toInt();
+        int y = match.captured(3).toInt();
         w->set_pos(x, y);
 
         return;
@@ -51,10 +55,5 @@ void manual(Main_Window *w, const QString &message){
     }
     else if(message == "right"){
         w->action_next_page_triggered();
-    }
-    else if(message == "point" || message == "draw"){
-        w->set_paint_mode(
-            message == "point" ? 0 : 1 // 0: POINTING, 1: DRAWING
-        );
     }
 }
