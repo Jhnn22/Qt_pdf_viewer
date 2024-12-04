@@ -19,8 +19,11 @@ public:
     Pdf_Viewer_Widget(const QUrl &url, QWidget *parent = nullptr);
     int get_current_page_index();
     int get_total_page_index();
+    qreal get_current_zoom();
     void page_changed(const int changed_page_index);
+    void zoom_changed(const qreal zoom);
     void set_page_mode(QPdfView::PageMode page_mode);
+    void set_scroll_bar(Qt::ScrollBarPolicy policy);
     QPdfView::PageMode get_current_page_mode();
     QRect get_size();
 
@@ -39,5 +42,6 @@ private:
 
 signals:
     void update_page_line_edit();
+    void update_current_zoom(const qreal zoom);
 };
 #endif // PDF_VIEWER_WIDGET_H
