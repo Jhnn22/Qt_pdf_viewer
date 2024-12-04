@@ -33,6 +33,7 @@ Event_Overlay_Widget::~Event_Overlay_Widget(){
     }
     paths.clear();
 }
+
 void Event_Overlay_Widget::paintEvent(QPaintEvent *event){
     // painter 설정
     QPainter painter(this);
@@ -72,7 +73,7 @@ int Event_Overlay_Widget::get_paint_mode(){
     return current_paint_mode;
 }
 
-void Event_Overlay_Widget::set_pos(const int x, const int y){
+void Event_Overlay_Widget::set_pos(const qreal x, const qreal y){
     prev_pos = current_pos;
     current_pos.setX(x); current_pos.setY(y);
 

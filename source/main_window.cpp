@@ -16,6 +16,7 @@
 #include <QHBoxLayout>
 #include <QMetaObject>
 #include <QMetaMethod>
+#include <algorithm>
 
 Main_Window::Main_Window(QWidget *parent)
     : QMainWindow(parent)
@@ -370,7 +371,7 @@ void Main_Window::action_full_screen_triggered(){
 
             ui->stacked_widget->removeWidget(focused_widget);
             ui->stacked_widget->setCurrentIndex(0);
-            this->hide();
+            // this->hide();
             focused_widget->setParent(nullptr);
             focused_widget->showFullScreen();
             event_overlay_widget->setFocus();
@@ -424,7 +425,15 @@ void Main_Window::set_paint_mode(int paint_mode){
 
 void Main_Window::set_pos(const int x, const int y){
     if(event_overlay_widget->parent() == focused_widget){
-        event_overlay_widget->set_pos(x, y);
+        qreal scaleX = static_cast<qreal>(focused_pdf_viewer_widget->get_size().width()) / 640;
+        qreal scaleY = static_cast<qreal>(focused_pdf_viewer_widget->get_size().height()) / 480;
+
+        qreal max_scale = std::max(scaleX, scaleY);
+
+        qreal scaled_x = x * max_scale;
+        qreal scaled_y = y * max_scale;
+
+        event_overlay_widget->set_pos(scaled_x, scaled_y);
     }
     else{
         qDebug() << "event_overlay_widget is yet added on focused_widget(set_pos)";

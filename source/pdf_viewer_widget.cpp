@@ -9,6 +9,7 @@
 #include <QMetaMethod>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QMouseEvent>
 
 Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
     : url(url), QWidget(parent)
@@ -45,6 +46,10 @@ QPdfView::PageMode Pdf_Viewer_Widget::get_current_page_mode(){
     return pdf_view->pageMode();
 }
 
+QRect Pdf_Viewer_Widget::get_size(){
+    return pdf_view->viewport()->rect();
+}
+
 void Pdf_Viewer_Widget::set_connects(){
     // 스크롤 바 사용시 페이지 표시 업데이트
     connect(pdf_view->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](){
@@ -58,6 +63,7 @@ void Pdf_Viewer_Widget::set_connects(){
             emit update_page_line_edit();
         }
     });
+
 
     connect(pdf_view, &QPdfView::pageModeChanged, this, [this](QPdfView::PageMode changed_page_mode){
         if(changed_page_mode == QPdfView::PageMode::MultiPage){

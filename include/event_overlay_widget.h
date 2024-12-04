@@ -26,7 +26,7 @@ public:
     void set_paint_mode(int paint_mode);
     int get_paint_mode();
 
-    void set_pos(const int x, const int y);
+    void set_pos(const qreal x, const qreal y);
 
 signals:
     void drawing_finished();
@@ -36,8 +36,7 @@ private:
     QPainterPath *path;
     QTimer *timer;
     QTimer *drawing_timeout_timer;
-    QPoint prev_mouse_position, current_mouse_position;
-    QPoint prev_pos, current_pos;
+    QPointF prev_pos, current_pos;
     bool is_dragging;
     int current_paint_mode;
     QList<QPainterPath*> paths;

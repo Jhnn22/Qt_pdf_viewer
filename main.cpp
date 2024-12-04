@@ -56,4 +56,10 @@ void manual(Main_Window *w, const QString &message){
     else if(message == "right"){
         w->action_next_page_triggered();
     }
+    else if(message == "ON"){
+        w->action_full_screen_triggered();
+    }
+    else if(message == "OFF"){
+        w->restore_from_full_screen();
+    }
 }

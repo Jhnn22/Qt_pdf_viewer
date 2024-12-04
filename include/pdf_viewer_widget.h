@@ -22,9 +22,7 @@ public:
     void page_changed(const int changed_page_index);
     void set_page_mode(QPdfView::PageMode page_mode);
     QPdfView::PageMode get_current_page_mode();
-
-signals:
-    void update_page_line_edit();
+    QRect get_size();
 
 private:
     QPdfView *pdf_view;                         // pdf를 표시
@@ -38,5 +36,8 @@ private:
 
     void set_connects();
     void set_pdf_viewer();
+
+signals:
+    void update_page_line_edit();
 };
 #endif // PDF_VIEWER_WIDGET_H
