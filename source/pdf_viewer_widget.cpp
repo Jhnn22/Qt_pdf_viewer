@@ -10,6 +10,9 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QMouseEvent>
+#include <QSize>
+#include <QSizeF>
+#include <QTransform>
 
 Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
     : url(url), QWidget(parent)
@@ -21,6 +24,7 @@ Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
 }
 
 int Pdf_Viewer_Widget::get_current_page_index(){
+    qDebug() << pdf_view->zoomFactor();
     return current_page_index;
 }
 
@@ -30,6 +34,10 @@ int Pdf_Viewer_Widget::get_total_page_index(){
 
 qreal Pdf_Viewer_Widget::get_current_zoom(){
     return pdf_view->zoomFactor();
+}
+
+qreal Pdf_Viewer_Widget::get(){
+    return (pdf_view->viewport()->size().width() / ((pdf_document->pagePointSize(current_page_index).width() * 96) / 72));
 }
 
 void Pdf_Viewer_Widget::page_changed(const int changed_page_index){
@@ -43,12 +51,19 @@ void Pdf_Viewer_Widget::page_changed(const int changed_page_index){
 }
 
 void Pdf_Viewer_Widget::zoom_changed(const qreal zoom){
+    if(pdf_view->zoomMode() == QPdfView::ZoomMode::FitInView || pdf_view->zoomMode() == QPdfView::ZoomMode::FitToWidth){
+        pdf_view->setZoomMode(QPdfView::ZoomMode::Custom);
+    }
     pdf_view->setZoomFactor(zoom);
     emit update_current_zoom(get_current_zoom());
 }
 
 void Pdf_Viewer_Widget::set_page_mode(QPdfView::PageMode page_mode){
     pdf_view->setPageMode(page_mode);
+}
+
+void Pdf_Viewer_Widget::set_zoom_mode(QPdfView::ZoomMode zoom_mode){
+    pdf_view->setZoomMode(zoom_mode);
 }
 
 void Pdf_Viewer_Widget::set_scroll_bar(Qt::ScrollBarPolicy policy){
@@ -60,7 +75,7 @@ QPdfView::PageMode Pdf_Viewer_Widget::get_current_page_mode(){
     return pdf_view->pageMode();
 }
 
-QRect Pdf_Viewer_Widget::get_size(){
+QRect Pdf_Viewer_Widget::get_viewport_size(){
     return pdf_view->viewport()->rect();
 }
 
@@ -98,8 +113,8 @@ void Pdf_Viewer_Widget::set_pdf_viewer(){
     current_page_index = pdf_page_navigator->currentPage();
     pdf_page_navigator->jump(current_page_index, {}, pdf_page_navigator->currentZoom());
     pdf_view->setDocumentMargins(QMargins(0, 0, 0, 0));
-    pdf_view->setPageMode(QPdfView::PageMode::MultiPage);
-    // pdf_view->setZoomMode(QPdfView::ZoomMode::FitInView);
+    set_page_mode(QPdfView::PageMode::MultiPage);
+    set_zoom_mode(QPdfView::ZoomMode::FitToWidth);
 
     // 레이아웃
     QVBoxLayout *vertical_layout = new QVBoxLayout(this);

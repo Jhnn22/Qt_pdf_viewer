@@ -27,6 +27,9 @@ Main_Window::Main_Window(QWidget *parent)
     , zoom_list{0.10, 0.25, 0.33, 0.50, 0.67, 0.75, 0.80, 0.90, 1.00,
                 1.10, 1.25, 1.50, 1.75, 2.00, 2.50, 3.00, 4.00, 5.00}{
     ui->setupUi(this);
+    ui->widget->layout()->setContentsMargins(0, 0, 0, 0);
+    ui->widget->layout()->setSpacing(0);
+    ui->widget->layout()->setAlignment(Qt::AlignTop);
     set_tool_bar();
     set_connects();
 }
@@ -144,7 +147,7 @@ void Main_Window::set_connects(){
                 page_line_edit->setText(QString::number(current_page_index + 1));
                 total_page_index = focused_pdf_viewer_widget->get_total_page_index();
                 total_page_label->setText(QString::number(total_page_index + 1));
-                zoom = focused_pdf_viewer_widget->get_current_zoom();
+                zoom = focused_pdf_viewer_widget->get();
                 int ratio = zoom * 100;
                 current_zoom->setText(QString::number(ratio).append('%'));
                 set_name(name);
@@ -225,7 +228,7 @@ void Main_Window::open_pdf(const QUrl &url){
             qDebug() << "current page:" << current_page_index + 1;
             page_line_edit->setText(QString::number(current_page_index + 1));
         });
-        connect(pdf_viewer_widget, &Pdf_Viewer_Widget::update_current_zoom, this, [this](const qreal zoom){
+        connect(pdf_viewer_widget, &Pdf_Viewer_Widget::update_current_zoom, this, [this, pdf_viewer_widget](const qreal zoom){
             this->zoom = zoom;
             int ratio = zoom * 100;
             current_zoom->setText(QString::number(ratio).append('%'));
@@ -262,7 +265,7 @@ QWidget *Main_Window::make_button(const QString &name){
     layout->setSpacing(0);
 
     QPushButton *button = new QPushButton(widget);
-    button->setMaximumWidth(150);
+    button->setMinimumWidth(113);
     button->setFixedHeight(30);
 
     QPushButton *button_2= new QPushButton(widget);
@@ -278,17 +281,17 @@ QWidget *Main_Window::make_button(const QString &name){
 
     widget->setLayout(layout);
 
-    ui->vertical_layout->addWidget(widget);
+    ui->widget->layout()->addWidget(widget);
 
     QMetaObject::invokeMethod(this, [this, name, button]{
         int width = button->width();
-        QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 10);  // 여유 값 10
+        QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 5);
         button->setText(elided_name);
     }, Qt::QueuedConnection);
 
     QMetaObject::Connection connection_f = connect(this, &Main_Window::f, this, [this, name, button]{
         int width = button->width();
-        QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 10);
+        QString elided_name = button->fontMetrics().elidedText(name, Qt::ElideRight, width - 5);
         button->setText(elided_name);
     });
     connect(button, &QPushButton::clicked, this, [this, name]{
@@ -332,7 +335,7 @@ QWidget *Main_Window::make_button(const QString &name){
 
         QWidget *named_widget_2 = hash.value(name).second;
         if(named_widget_2){
-            ui->vertical_layout->removeWidget(named_widget_2);
+            ui->widget->layout()->removeWidget(named_widget_2);
             named_widget_2->removeEventFilter(this);
             named_widget_2->hide();
             named_widget_2->deleteLater();
@@ -467,6 +470,7 @@ void Main_Window::action_full_screen_triggered(){
         if(focused_pdf_viewer_widget){
             focused_pdf_viewer_widget->set_page_mode(QPdfView::PageMode::SinglePage);
             focused_pdf_viewer_widget->set_scroll_bar(Qt::ScrollBarAlwaysOff);
+            focused_pdf_viewer_widget->set_zoom_mode(QPdfView::ZoomMode::FitInView);
 
             focused_widget->layout()->addWidget(event_overlay_widget);
             event_overlay_widget->show();
@@ -495,6 +499,7 @@ void Main_Window::restore_from_full_screen(){
         if(focused_pdf_viewer_widget){
             focused_pdf_viewer_widget->set_page_mode(QPdfView::PageMode::MultiPage);
             focused_pdf_viewer_widget->set_scroll_bar(Qt::ScrollBarAsNeeded);
+            focused_pdf_viewer_widget->set_zoom_mode(QPdfView::ZoomMode::FitToWidth);
 
             focused_widget->layout()->removeWidget(event_overlay_widget);
             event_overlay_widget->setParent(nullptr);
@@ -529,8 +534,8 @@ void Main_Window::set_paint_mode(int paint_mode){
 
 void Main_Window::set_pos(const int x, const int y){
     if(event_overlay_widget->parent() == focused_widget){
-        qreal scaleX = static_cast<qreal>(focused_pdf_viewer_widget->get_size().width()) / 640;
-        qreal scaleY = static_cast<qreal>(focused_pdf_viewer_widget->get_size().height()) / 480;
+        qreal scaleX = static_cast<qreal>(focused_pdf_viewer_widget->get_viewport_size().width()) / 640;
+        qreal scaleY = static_cast<qreal>(focused_pdf_viewer_widget->get_viewport_size().height()) / 480;
 
         qreal max_scale = std::max(scaleX, scaleY);
 
