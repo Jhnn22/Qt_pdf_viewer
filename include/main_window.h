@@ -26,25 +26,8 @@ public:
     explicit Main_Window(QWidget *parent = nullptr);
     ~Main_Window();
 
+protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
-    QString get_name();
-
-public slots:
-    void load_push_button_clicked();
-    void page_line_edit_return_pressed(const QString &input_text);
-    void action_prev_page_triggered();
-    void action_next_page_triggered();
-    void zoom_out_triggered();
-    void current_zoom_return_pressed(const QString &input_text);
-    void zoom_in_triggered();
-    void action_full_screen_triggered();
-    void restore_from_full_screen();
-    void set_paint_mode(int paint_mode);
-    void set_pos(const int x, const int y);
-
-signals:
-    void current_widget_changed(const QString &name);
-    void f();
 
 private:
     Ui::Main_Window *ui;
@@ -70,6 +53,23 @@ private:
     QWidget *make_button(const QString &name);
     void set_name(const QString &name);
     int find_nearest_zoom(const qreal zoom);
+
+signals:
+    void current_widget_changed(const QString &name);
+    void f();
+
+public slots:
+    void load_push_button_clicked();
+    void page_line_edit_return_pressed(const QString &input_text);
+    void action_prev_page_triggered();
+    void action_next_page_triggered();
+    void zoom_out_triggered();
+    void current_zoom_return_pressed(const QString &input_text);
+    void zoom_in_triggered();
+    void action_full_screen_triggered();
+    void restore_from_full_screen();
+    void set_paint_mode(int paint_mode);
+    void set_pos(const int x, const int y);
 };
 
 #endif // MAIN_WINDOW_H

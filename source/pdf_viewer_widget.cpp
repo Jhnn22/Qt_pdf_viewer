@@ -21,6 +21,42 @@ Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
 {
     set_pdf_viewer();
     set_connects();
+    setFocusPolicy(Qt::StrongFocus);
+}
+
+bool Pdf_Viewer_Widget::eventFilter(QObject *obj, QEvent *event){
+    QMouseEvent *mouse_event = dynamic_cast<QMouseEvent*>(event);
+    if(mouse_event){
+        QScrollBar *h = pdf_view->horizontalScrollBar();
+        QScrollBar *v = pdf_view->verticalScrollBar();
+        if(mouse_event->type() == QEvent::MouseButtonPress){
+            start_pos = mouse_event->pos();
+            start_h = h->value();
+            start_v = v->value();
+
+            drag_and_drop = true;
+        }
+
+        if(mouse_event->type() == QEvent::MouseMove && drag_and_drop){
+            QPoint delta = mouse_event->pos() - start_pos;
+
+            h->setValue(start_h - delta.x());
+            v->setValue(start_v - delta.y());
+        }
+
+        if(mouse_event->type() == QEvent::MouseButtonRelease){
+            drag_and_drop = false;
+        }
+    }
+
+    // 다른 이벤트는 부모 클래스의 이벤트 필터로 전달
+    return QWidget::eventFilter(obj, event);
+}
+
+void Pdf_Viewer_Widget::keyPressEvent(QKeyEvent *event){
+    if(event->key() == Qt::Key_D){
+        emit set_attribute();
+    }
 }
 
 int Pdf_Viewer_Widget::get_current_page_index(){
@@ -141,6 +177,7 @@ void Pdf_Viewer_Widget::set_pdf_viewer(){
     pdf_view->setDocumentMargins(QMargins(0, 0, 0, 0));
     set_page_mode(QPdfView::PageMode::MultiPage);
     set_zoom_mode(QPdfView::ZoomMode::FitToWidth);
+    pdf_view->viewport()->installEventFilter(this);
 
     // 레이아웃
     QVBoxLayout *vertical_layout = new QVBoxLayout(this);

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QPdfView>
 #include <QUrl>
+#include <QPoint>
 
 #define SINGLE_PAGE 0
 #define MULTI_PAGE  1
@@ -30,6 +31,10 @@ public:
     QPdfView::PageMode get_current_page_mode();
     QSize get_viewport_size();
 
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+
 private:
     QPdfView *pdf_view;                         // pdf를 표시
     QPdfDocument *pdf_document;                 // pdf의 데이터를 제공
@@ -43,8 +48,13 @@ private:
     void set_connects();
     void set_pdf_viewer();
 
+    bool drag_and_drop = false;
+    QPoint start_pos;
+    int start_h = 0; int start_v = 0;
+
 signals:
     void update_page_line_edit();
     void update_current_zoom(const qreal zoom);
+    void set_attribute();
 };
 #endif // PDF_VIEWER_WIDGET_H

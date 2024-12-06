@@ -235,6 +235,11 @@ void Main_Window::open_pdf(const QUrl &url){
             int ratio = zoom * 100;
             current_zoom->setText(QString::number(ratio).append('%'));
         });
+        connect(pdf_viewer_widget, &Pdf_Viewer_Widget::set_attribute, this, [this, pdf_viewer_widget](){
+            if(event_overlay_widget->parent() != nullptr){
+                event_overlay_widget->set_attribute();
+            }
+        });
     }
     else{
         qDebug() << "can't open pdf";
@@ -358,10 +363,6 @@ QWidget *Main_Window::make_button(const QString &name){
 
 void Main_Window::set_name(const QString &name){
     this->name = name;
-}
-
-QString Main_Window::get_name(){
-    return name;
 }
 
 void Main_Window::page_line_edit_return_pressed(const QString &input_text){
