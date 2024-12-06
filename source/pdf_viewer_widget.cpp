@@ -24,7 +24,6 @@ Pdf_Viewer_Widget::Pdf_Viewer_Widget(const QUrl &url, QWidget *parent)
 }
 
 int Pdf_Viewer_Widget::get_current_page_index(){
-    qDebug() << pdf_view->zoomFactor();
     return current_page_index;
 }
 
@@ -37,7 +36,34 @@ qreal Pdf_Viewer_Widget::get_current_zoom(){
 }
 
 qreal Pdf_Viewer_Widget::get(){
-    return (pdf_view->viewport()->size().width() / ((pdf_document->pagePointSize(current_page_index).width() * 96) / 72));
+    int x = pdf_document->pagePointSize(current_page_index).width();
+
+    qreal point_to_pixel = 96.0 / 72.0;
+
+    qreal scaled_x = x * point_to_pixel;
+
+    qDebug() << get_viewport_size().width() / scaled_x;
+    return get_viewport_size().width() / scaled_x;
+}
+
+qreal Pdf_Viewer_Widget::get_2(){
+    int x = pdf_document->pagePointSize(current_page_index).width();
+    int y = pdf_document->pagePointSize(current_page_index).height();
+    qDebug() << x << y;
+
+    qreal point_to_pixel = 96.0 / 72.0;
+
+    qreal scaled_x = x * point_to_pixel;
+    qreal scaled_y = y * point_to_pixel;
+
+    if(x >= y){
+        qDebug() << get_viewport_size().width() / scaled_x;
+        return get_viewport_size().width() / scaled_x;
+    }
+    else{
+        qDebug() << get_viewport_size().height() / scaled_y;
+        return get_viewport_size().height() / scaled_y;
+    }
 }
 
 void Pdf_Viewer_Widget::page_changed(const int changed_page_index){
@@ -75,8 +101,8 @@ QPdfView::PageMode Pdf_Viewer_Widget::get_current_page_mode(){
     return pdf_view->pageMode();
 }
 
-QRect Pdf_Viewer_Widget::get_viewport_size(){
-    return pdf_view->viewport()->rect();
+QSize Pdf_Viewer_Widget::get_viewport_size(){
+    return pdf_view->viewport()->size();
 }
 
 void Pdf_Viewer_Widget::set_connects(){

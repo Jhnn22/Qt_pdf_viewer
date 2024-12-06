@@ -147,9 +147,11 @@ void Main_Window::set_connects(){
                 page_line_edit->setText(QString::number(current_page_index + 1));
                 total_page_index = focused_pdf_viewer_widget->get_total_page_index();
                 total_page_label->setText(QString::number(total_page_index + 1));
+                // 비율 수동 계산-----
                 zoom = focused_pdf_viewer_widget->get();
                 int ratio = zoom * 100;
                 current_zoom->setText(QString::number(ratio).append('%'));
+                // -----------------
                 set_name(name);
             }
             else{
@@ -457,20 +459,30 @@ void Main_Window::zoom_in_triggered(){
 
 int Main_Window::find_nearest_zoom(const qreal zoom){
     auto it = std::lower_bound(zoom_list.begin(), zoom_list.end(), zoom);
-    if(it == zoom_list.end()){
-        return zoom_list.size() - 1;
+    if( *it > zoom){
+        it--;
     }
     int num = it - zoom_list.begin();
-
     return num;
 }
 
 void Main_Window::action_full_screen_triggered(){
     if(focused_widget){
         if(focused_pdf_viewer_widget){
+            prev_zoom = zoom;
+
             focused_pdf_viewer_widget->set_page_mode(QPdfView::PageMode::SinglePage);
             focused_pdf_viewer_widget->set_scroll_bar(Qt::ScrollBarAlwaysOff);
             focused_pdf_viewer_widget->set_zoom_mode(QPdfView::ZoomMode::FitInView);
+
+            QMetaObject::invokeMethod(this, [this](){
+                // 비율 수동 계산-----
+                zoom = focused_pdf_viewer_widget->get_2();
+                int ratio = zoom * 100;
+                current_zoom->setText(QString::number(ratio).append('%'));
+                // -----------------
+
+            }, Qt::QueuedConnection);
 
             focused_widget->layout()->addWidget(event_overlay_widget);
             event_overlay_widget->show();
@@ -499,7 +511,6 @@ void Main_Window::restore_from_full_screen(){
         if(focused_pdf_viewer_widget){
             focused_pdf_viewer_widget->set_page_mode(QPdfView::PageMode::MultiPage);
             focused_pdf_viewer_widget->set_scroll_bar(Qt::ScrollBarAsNeeded);
-            focused_pdf_viewer_widget->set_zoom_mode(QPdfView::ZoomMode::FitToWidth);
 
             focused_widget->layout()->removeWidget(event_overlay_widget);
             event_overlay_widget->setParent(nullptr);
@@ -511,6 +522,8 @@ void Main_Window::restore_from_full_screen(){
             ui->stacked_widget->setCurrentWidget(focused_widget);
 
             emit current_widget_changed(name);
+            qDebug() << prev_zoom;
+            focused_pdf_viewer_widget->zoom_changed(prev_zoom);
         }
         else{
             qDebug() << "focus_pdf_viwwer_widget is null(restore_from_full_screen)";

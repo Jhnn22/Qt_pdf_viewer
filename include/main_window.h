@@ -59,7 +59,7 @@ private:
     QHash<QString, QPair<QWidget*, QWidget*>> hash;
     QHash<QWidget*, QPushButton*> hash_2;
     QString name;
-    qreal zoom;
+    qreal prev_zoom, zoom;
     const QVector<qreal> zoom_list;
     int zoom_list_idx;
 

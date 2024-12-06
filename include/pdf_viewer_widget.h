@@ -21,13 +21,14 @@ public:
     int get_total_page_index();
     qreal get_current_zoom();
     qreal get();
+    qreal get_2();
     void page_changed(const int changed_page_index);
     void zoom_changed(const qreal zoom);
     void set_page_mode(QPdfView::PageMode page_mode);
     void set_zoom_mode(QPdfView::ZoomMode zoom_mode);
     void set_scroll_bar(Qt::ScrollBarPolicy policy);
     QPdfView::PageMode get_current_page_mode();
-    QRect get_viewport_size();
+    QSize get_viewport_size();
 
 private:
     QPdfView *pdf_view;                         // pdf를 표시
