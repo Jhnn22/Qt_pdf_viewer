@@ -1,1 +1,1 @@
-# PdfViewer_with_Qt
+# Qt_pdf_viewer
