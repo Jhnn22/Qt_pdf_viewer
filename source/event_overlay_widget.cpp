@@ -123,4 +123,16 @@ void Event_Overlay_Widget::keyPressEvent(QKeyEvent *event){
     if(event->key() == Qt::Key_Escape){
         emit restore_from_full_screen();
     }
+    if(event->key() == Qt::Key_D){
+        set_attribute();
+    }
+}
+
+void Event_Overlay_Widget::set_attribute(){
+    bool flag = testAttribute(Qt::WA_TransparentForMouseEvents);
+    setAttribute(Qt::WA_TransparentForMouseEvents, !flag);
+    if(flag){
+        qDebug() << "Has Focus: " << this->hasFocus();
+        setFocus();
+    }
 }
