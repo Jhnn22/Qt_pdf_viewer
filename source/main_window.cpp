@@ -491,7 +491,7 @@ void Main_Window::action_full_screen_triggered(){
 
             ui->stacked_widget->removeWidget(focused_widget);
             ui->stacked_widget->setCurrentIndex(0);
-            // this->hide();
+            this->hide();
             focused_widget->setParent(nullptr);
             focused_widget->showFullScreen();
             event_overlay_widget->setFocus();
