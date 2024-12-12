@@ -131,6 +131,8 @@ void Event_Overlay_Widget::keyPressEvent(QKeyEvent *event){
 void Event_Overlay_Widget::set_attribute(){
     bool flag = testAttribute(Qt::WA_TransparentForMouseEvents);
     setAttribute(Qt::WA_TransparentForMouseEvents, !flag);
-    if(!flag) qDebug() << "true";
-    else qDebug() << "false";
+    if(flag){
+        qDebug() << "Has Focus: " << this->hasFocus();
+        setFocus();
+    }
 }
